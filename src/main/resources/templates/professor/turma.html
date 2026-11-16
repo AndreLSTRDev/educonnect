@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Turma')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-4">
+    <div th:replace="~{fragments :: mensagens}"></div>
+    <a th:href="@{/professor}" class="small">&larr; Minhas turmas</a>
+    <h1 class="h3 my-3" th:text="${turma.disciplina.nome} + ' – turma ' + ${turma.codigo} + ' (' + ${turma.periodo} + ')'">Turma</h1>
+    <p><a class="btn btn-outline-primary btn-sm" th:href="@{/professor/turmas/{id}/frequencia(id=${turma.id})}">Registrar frequência</a></p>
+
+    <div class="row g-3">
+        <div class="col-12 col-lg-5">
+            <div class="card h-100"><div class="card-body">
+                <h2 class="h5">Nova avaliação</h2>
+                <p class="text-muted small"><span class="req" aria-hidden="true">*</span> campo obrigatório</p>
+                <form method="post" th:action="@{/professor/turmas/{id}/avaliacoes(id=${turma.id})}">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome <span class="req" aria-hidden="true">*</span></label>
+                        <input id="nome" name="nome" class="form-control" required maxlength="120" placeholder="Prova 1">
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-7">
+                            <label for="data" class="form-label">Data <span class="req" aria-hidden="true">*</span></label>
+                            <input id="data" name="data" type="date" class="form-control" required th:value="${hoje}">
+                        </div>
+                        <div class="col-5">
+                            <label for="valorMaximo" class="form-label">Valor máx. <span class="req" aria-hidden="true">*</span></label>
+                            <input id="valorMaximo" name="valorMaximo" class="form-control" required inputmode="decimal" value="10">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cadastrar avaliação</button>
+                </form>
+            </div></div>
+        </div>
+        <div class="col-12 col-lg-7">
+            <div class="card h-100"><div class="card-body">
+                <h2 class="h5">Avaliações</h2>
+                <p class="text-muted" th:if="${avaliacoes.isEmpty()}">Nenhuma avaliação cadastrada.</p>
+                <div class="table-responsive" th:unless="${avaliacoes.isEmpty()}">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead><tr><th scope="col">Avaliação</th><th scope="col">Data</th><th scope="col">Valor máx.</th><th scope="col"></th></tr></thead>
+                        <tbody>
+                        <tr th:each="a : ${avaliacoes}">
+                            <td th:text="${a.nome}">Prova</td>
+                            <td th:text="${#temporals.format(a.dataAvaliacao, 'dd/MM/yyyy')}">01/01/2026</td>
+                            <td th:text="${#numbers.formatDecimal(a.valorMaximo, 1, 1, 'COMMA')}">10,0</td>
+                            <td><a class="btn btn-sm btn-primary" th:href="@{/professor/avaliacoes/{id}/notas(id=${a.id})}">Lançar notas</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div></div>
+        </div>
+    </div>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>

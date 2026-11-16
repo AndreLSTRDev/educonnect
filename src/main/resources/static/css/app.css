@@ -1,0 +1,7 @@
+body { background: #f5f7fb; }
+main { min-height: 70vh; }
+.card { border: 0; box-shadow: 0 1px 4px rgba(0, 0, 0, .08); }
+.req { color: #b02a37; }
+.nota-input { max-width: 7rem; }
+th, td { vertical-align: middle; }
+.table-responsive { -webkit-overflow-scrolling: touch; }

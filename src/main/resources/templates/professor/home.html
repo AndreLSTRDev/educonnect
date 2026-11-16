@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Painel do professor')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-4">
+    <div th:replace="~{fragments :: mensagens}"></div>
+    <h1 class="h3 mb-3">Minhas turmas</h1>
+    <p class="text-muted" th:if="${turmas.isEmpty()}">Você ainda não é responsável por nenhuma turma.</p>
+    <div class="row g-3">
+        <div class="col-12 col-md-6 col-lg-4" th:each="t : ${turmas}">
+            <div class="card h-100"><div class="card-body">
+                <h2 class="h5" th:text="${t.disciplina.nome}">Disciplina</h2>
+                <p class="mb-1 text-muted" th:text="'Turma ' + ${t.codigo} + ' – ' + ${t.periodo}">Turma</p>
+                <p class="mb-3"><span th:text="${t.alunos.size()}">0</span> aluno(s)
+                    <span class="badge text-bg-secondary ms-1" th:if="${t.encerrada}">Encerrada</span></p>
+                <a class="btn btn-primary btn-sm" th:href="@{/professor/turmas/{id}(id=${t.id})}">Abrir turma</a>
+            </div></div>
+        </div>
+    </div>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>

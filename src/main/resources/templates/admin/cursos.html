@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Cursos e disciplinas')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-4">
+    <div th:replace="~{fragments :: mensagens}"></div>
+    <h1 class="h3 mb-3">Cursos e disciplinas</h1>
+    <p class="text-muted small"><span class="req" aria-hidden="true">*</span> campo obrigatório</p>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-5">
+            <div class="card h-100"><div class="card-body">
+                <h2 class="h5">Novo curso</h2>
+                <form method="post" th:action="@{/admin/cursos}">
+                    <label for="nomeCurso" class="form-label">Nome do curso <span class="req" aria-hidden="true">*</span></label>
+                    <input id="nomeCurso" name="nome" class="form-control mb-3" required maxlength="150">
+                    <button type="submit" class="btn btn-primary">Cadastrar curso</button>
+                </form>
+            </div></div>
+        </div>
+        <div class="col-12 col-lg-7">
+            <div class="card h-100"><div class="card-body">
+                <h2 class="h5">Nova disciplina</h2>
+                <form method="post" th:action="@{/admin/disciplinas}">
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <label for="cursoId" class="form-label">Curso <span class="req" aria-hidden="true">*</span></label>
+                            <select id="cursoId" name="cursoId" class="form-select" required>
+                                <option value="">Selecione...</option>
+                                <option th:each="c : ${cursos}" th:value="${c.id}" th:text="${c.nome}">Curso</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="nomeDisc" class="form-label">Nome <span class="req" aria-hidden="true">*</span></label>
+                            <input id="nomeDisc" name="nome" class="form-control" required maxlength="150">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label for="codigo" class="form-label">Código <span class="req" aria-hidden="true">*</span></label>
+                            <input id="codigo" name="codigo" class="form-control" required maxlength="30">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label for="carga" class="form-label">Carga horária <span class="req" aria-hidden="true">*</span></label>
+                            <input id="carga" name="cargaHoraria" type="number" min="1" class="form-control" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Cadastrar disciplina</button>
+                </form>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="card mb-3" th:each="c : ${cursos}">
+        <div class="card-body">
+            <h2 class="h5" th:text="${c.nome}">Curso</h2>
+            <p class="text-muted mb-2" th:if="${c.disciplinas.isEmpty()}">Nenhuma disciplina cadastrada.</p>
+            <div class="table-responsive" th:unless="${c.disciplinas.isEmpty()}">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th scope="col">Código</th><th scope="col">Disciplina</th><th scope="col">Carga horária</th></tr></thead>
+                    <tbody>
+                    <tr th:each="d : ${c.disciplinas}">
+                        <td th:text="${d.codigo}">COD</td>
+                        <td th:text="${d.nome}">Nome</td>
+                        <td th:text="${d.cargaHoraria} + ' h'">60 h</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <p class="text-muted" th:if="${cursos.isEmpty()}">Nenhum curso cadastrado ainda.</p>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>

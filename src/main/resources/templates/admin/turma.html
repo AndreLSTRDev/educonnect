@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Turma')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-4">
+    <div th:replace="~{fragments :: mensagens}"></div>
+    <a th:href="@{/admin/turmas}" class="small">&larr; Voltar às turmas</a>
+    <h1 class="h3 my-3" th:text="${turma.disciplina.nome} + ' – turma ' + ${turma.codigo} + ' (' + ${turma.periodo} + ')'">Turma</h1>
+    <p>
+        <span class="badge" th:classappend="${turma.encerrada} ? 'text-bg-secondary' : 'text-bg-success'"
+              th:text="${turma.encerrada} ? 'Encerrada' : 'Em andamento'">Status</span>
+    </p>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-6">
+            <div class="card h-100"><div class="card-body">
+                <h2 class="h5">Professor responsável</h2>
+                <form method="post" th:action="@{/admin/turmas/{id}/professor(id=${turma.id})}">
+                    <label for="professorId" class="form-label">Professor <span class="req" aria-hidden="true">*</span></label>
+                    <select id="professorId" name="professorId" class="form-select mb-3" required>
+                        <option th:each="p : ${professores}" th:value="${p.id}" th:text="${p.nomeCompleto}"
+                                th:selected="${p.id == turma.professor.id}">Prof</option>
+                    </select>
+                    <button type="submit" class="btn btn-outline-primary">Vincular professor</button>
+                </form>
+            </div></div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card h-100"><div class="card-body">
+                <h2 class="h5">Vincular aluno</h2>
+                <form method="post" th:action="@{/admin/turmas/{id}/alunos(id=${turma.id})}">
+                    <label for="alunoId" class="form-label">Aluno <span class="req" aria-hidden="true">*</span></label>
+                    <select id="alunoId" name="alunoId" class="form-select mb-3" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="a : ${alunosDisponiveis}" th:value="${a.id}"
+                                th:text="${a.nomeCompleto} + ' (' + ${a.identificadorInstitucional} + ')'">Aluno</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary" th:disabled="${turma.encerrada}">Vincular aluno</button>
+                </form>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2 class="h5">Alunos da turma (<span th:text="${turma.alunos.size()}">0</span>)</h2>
+            <p class="text-muted mb-0" th:if="${turma.alunos.isEmpty()}">Nenhum aluno vinculado.</p>
+            <ul class="mb-0" th:unless="${turma.alunos.isEmpty()}">
+                <li th:each="a : ${turma.alunos}" th:text="${a.nomeCompleto} + ' – ' + ${a.matricula}">Aluno</li>
+            </ul>
+        </div>
+    </div>
+
+    <form method="post" th:action="@{/admin/turmas/{id}/encerrar(id=${turma.id})}" th:unless="${turma.encerrada}">
+        <button type="submit" class="btn btn-outline-danger">Encerrar turma</button>
+        <span class="form-text ms-2">Após encerrar, aprovação/reprovação passam a ser exibidas aos alunos.</span>
+    </form>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Painel administrativo')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-4">
+    <div th:replace="~{fragments :: mensagens}"></div>
+    <h1 class="h3 mb-4">Painel administrativo</h1>
+    <div class="row g-3">
+        <div class="col-12 col-sm-6 col-lg-3">
+            <a class="card text-decoration-none h-100" th:href="@{/admin/usuarios}">
+                <div class="card-body"><div class="display-6" th:text="${totalUsuarios}">0</div>Usuários</div>
+            </a>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <a class="card text-decoration-none h-100" th:href="@{/admin/cursos}">
+                <div class="card-body"><div class="display-6" th:text="${totalCursos}">0</div>Cursos</div>
+            </a>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <a class="card text-decoration-none h-100" th:href="@{/admin/cursos}">
+                <div class="card-body"><div class="display-6" th:text="${totalDisciplinas}">0</div>Disciplinas</div>
+            </a>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+            <a class="card text-decoration-none h-100" th:href="@{/admin/turmas}">
+                <div class="card-body"><div class="display-6" th:text="${totalTurmas}">0</div>Turmas</div>
+            </a>
+        </div>
+    </div>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>

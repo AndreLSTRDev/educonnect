@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Acompanhar denúncia')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-4">
+    <div th:replace="~{fragments :: mensagens}"></div>
+    <a th:href="@{/aluno/denuncias}" class="small">&larr; Minhas denúncias</a>
+    <div class="card my-3"><div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between gap-2">
+            <h1 class="h4 mb-0" th:text="${denuncia.titulo}">Título</h1>
+            <span class="badge align-self-start" th:classappend="'text-bg-' + ${denuncia.status.cor}" th:text="${denuncia.status.rotulo}">Status</span>
+        </div>
+        <p class="text-muted mb-2">Protocolo <strong th:text="${denuncia.protocolo}">EDU</strong>
+            · <span th:text="${denuncia.categoria.rotulo}">Cat</span>
+            · <span th:text="${#temporals.format(denuncia.dataAbertura, 'dd/MM/yyyy HH:mm')}">data</span></p>
+        <p style="white-space: pre-wrap" th:text="${denuncia.descricao}">Descrição</p>
+    </div></div>
+
+    <h2 class="h5">Andamento</h2>
+    <ol class="list-group list-group-numbered">
+        <li class="list-group-item" th:each="h : ${denuncia.historico}">
+            <strong th:text="${h.statusNovo.rotulo}">Status</strong>
+            <span class="text-muted small" th:text="' – ' + ${#temporals.format(h.dataAlteracao, 'dd/MM/yyyy HH:mm')}">data</span>
+            <div th:if="${h.comentario != null}" th:text="${h.comentario}">Comentário</div>
+        </li>
+    </ol>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>

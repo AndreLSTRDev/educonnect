@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Painel do aluno')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-4">
+    <div th:replace="~{fragments :: mensagens}"></div>
+    <h1 class="h3 mb-4" th:text="'Olá, ' + ${logado.nome}">Olá</h1>
+    <div class="row g-3">
+        <div class="col-12 col-md-4">
+            <a class="card text-decoration-none h-100" th:href="@{/aluno/desempenho}">
+                <div class="card-body"><h2 class="h5">Desempenho</h2>
+                    <p class="mb-0 text-muted">Médias, frequência e situação por disciplina<span th:if="${periodoAtual != null}" th:text="' (período ' + ${periodoAtual} + ')'"></span>.</p></div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4">
+            <a class="card text-decoration-none h-100" th:href="@{/aluno/historico}">
+                <div class="card-body"><h2 class="h5">Histórico acadêmico</h2>
+                    <p class="mb-0 text-muted">Disciplinas cursadas, notas e resultados.</p></div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4">
+            <a class="card text-decoration-none h-100" th:href="@{/aluno/denuncias}">
+                <div class="card-body"><h2 class="h5">Denúncias</h2>
+                    <p class="mb-0 text-muted">Registre e acompanhe (<span th:text="${totalDenuncias}">0</span> registrada(s)).</p></div>
+            </a>
+        </div>
+    </div>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>

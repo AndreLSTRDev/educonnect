@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Analisar denúncia')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-4">
+    <div th:replace="~{fragments :: mensagens}"></div>
+    <a th:href="@{/gestor}" class="small">&larr; Denúncias</a>
+    <div class="card my-3"><div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between gap-2">
+            <h1 class="h4 mb-0" th:text="${denuncia.titulo}">Título</h1>
+            <span class="badge align-self-start" th:classappend="'text-bg-' + ${denuncia.status.cor}" th:text="${denuncia.status.rotulo}">Status</span>
+        </div>
+        <p class="text-muted mb-2">Protocolo <strong th:text="${denuncia.protocolo}">EDU</strong>
+            · <span th:text="${denuncia.categoria.rotulo}">Cat</span>
+            · aluno: <span th:text="${denuncia.aluno.nomeCompleto}">Aluno</span>
+            · <span th:text="${#temporals.format(denuncia.dataAbertura, 'dd/MM/yyyy HH:mm')}">data</span></p>
+        <p style="white-space: pre-wrap" th:text="${denuncia.descricao}">Descrição</p>
+    </div></div>
+
+    <div class="row g-3">
+        <div class="col-12 col-lg-5">
+            <div class="card h-100"><div class="card-body">
+                <h2 class="h5">Atualizar status</h2>
+                <form method="post" th:action="@{/gestor/denuncias/{id}/status(id=${denuncia.id})}">
+                    <label for="novoStatus" class="form-label">Novo status <span class="req" aria-hidden="true">*</span></label>
+                    <select id="novoStatus" name="status" class="form-select mb-3" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="s : ${todosStatus}" th:value="${s}" th:text="${s.rotulo}">S</option>
+                    </select>
+                    <label for="comentario" class="form-label">Comentário (visível ao aluno)</label>
+                    <textarea id="comentario" name="comentario" class="form-control mb-3" rows="3" maxlength="500"></textarea>
+                    <button type="submit" class="btn btn-primary">Salvar alteração</button>
+                </form>
+            </div></div>
+        </div>
+        <div class="col-12 col-lg-7">
+            <div class="card h-100"><div class="card-body">
+                <h2 class="h5">Histórico de alterações</h2>
+                <ol class="list-group list-group-numbered">
+                    <li class="list-group-item" th:each="h : ${denuncia.historico}">
+                        <strong th:text="${h.statusAnterior != null} ? ${h.statusAnterior.rotulo} + ' → ' + ${h.statusNovo.rotulo} : ${h.statusNovo.rotulo}">Status</strong>
+                        <span class="text-muted small"
+                              th:text="' – ' + ${#temporals.format(h.dataAlteracao, 'dd/MM/yyyy HH:mm')} + (${h.responsavel != null} ? ' por ' + ${h.responsavel.nomeCompleto} : '')">data</span>
+                        <div th:if="${h.comentario != null}" th:text="${h.comentario}">Comentário</div>
+                    </li>
+                </ol>
+            </div></div>
+        </div>
+    </div>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>

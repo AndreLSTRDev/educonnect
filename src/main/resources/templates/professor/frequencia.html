@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Frequência')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-4">
+    <div th:replace="~{fragments :: mensagens}"></div>
+    <a th:href="@{/professor/turmas/{id}(id=${turma.id})}" class="small">&larr; Voltar à turma</a>
+    <h1 class="h3 my-3" th:text="'Frequência – ' + ${turma.disciplina.nome} + ' (turma ' + ${turma.codigo} + ')'">Frequência</h1>
+
+    <form method="get" class="row g-2 align-items-end mb-3" th:action="@{/professor/turmas/{id}/frequencia(id=${turma.id})}">
+        <div class="col-auto">
+            <label for="dataConsulta" class="form-label">Data da aula</label>
+            <input id="dataConsulta" name="data" type="date" class="form-control" th:value="${data}" th:max="${hoje}">
+        </div>
+        <div class="col-auto"><button type="submit" class="btn btn-outline-secondary">Carregar</button></div>
+    </form>
+
+    <p class="text-muted" th:if="${turma.alunos.isEmpty()}">A turma ainda não tem alunos vinculados.</p>
+    <form method="post" th:action="@{/professor/turmas/{id}/frequencia(id=${turma.id})}" th:unless="${turma.alunos.isEmpty()}">
+        <input type="hidden" name="data" th:value="${data}">
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <caption class="visually-hidden">Presença dos alunos na data selecionada</caption>
+                    <thead><tr><th scope="col">Aluno</th><th scope="col">Presente?</th></tr></thead>
+                    <tbody>
+                    <tr th:each="a : ${turma.alunos}">
+                        <td th:text="${a.nomeCompleto}">Aluno</td>
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="presentes" th:id="'p_' + ${a.id}"
+                                       th:value="${a.id}" th:checked="${presencas.isEmpty() or presencas[a.id] == true}">
+                                <label class="form-check-label" th:for="'p_' + ${a.id}">Presente</label>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p class="form-text">Alunos desmarcados são registrados como ausentes na data de <strong th:text="${#temporals.format(data, 'dd/MM/yyyy')}">data</strong>.</p>
+        <button type="submit" class="btn btn-primary">Salvar frequência</button>
+    </form>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>

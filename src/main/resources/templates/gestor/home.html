@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Denúncias')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-4">
+    <div th:replace="~{fragments :: mensagens}"></div>
+    <h1 class="h3 mb-3">Gerenciar denúncias</h1>
+
+    <form method="get" class="row g-2 align-items-end mb-3" th:action="@{/gestor}">
+        <div class="col-auto">
+            <label for="status" class="form-label">Filtrar por status</label>
+            <select id="status" name="status" class="form-select">
+                <option value="">Todos</option>
+                <option th:each="s : ${todosStatus}" th:value="${s}" th:text="${s.rotulo}" th:selected="${s == statusFiltro}">S</option>
+            </select>
+        </div>
+        <div class="col-auto"><button type="submit" class="btn btn-outline-secondary">Filtrar</button></div>
+    </form>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <caption class="visually-hidden">Denúncias registradas</caption>
+                <thead><tr><th scope="col">Protocolo</th><th scope="col">Título</th><th scope="col">Categoria</th>
+                    <th scope="col">Aluno</th><th scope="col">Abertura</th><th scope="col">Status</th><th scope="col"></th></tr></thead>
+                <tbody>
+                <tr th:each="d : ${denuncias}">
+                    <td th:text="${d.protocolo}">EDU</td>
+                    <td th:text="${d.titulo}">Título</td>
+                    <td th:text="${d.categoria.rotulo}">Cat</td>
+                    <td th:text="${d.aluno.nomeCompleto}">Aluno</td>
+                    <td th:text="${#temporals.format(d.dataAbertura, 'dd/MM/yyyy HH:mm')}">data</td>
+                    <td><span class="badge" th:classappend="'text-bg-' + ${d.status.cor}" th:text="${d.status.rotulo}">Status</span></td>
+                    <td><a class="btn btn-sm btn-primary" th:href="@{/gestor/denuncias/{id}(id=${d.id})}">Analisar</a></td>
+                </tr>
+                <tr th:if="${denuncias.isEmpty()}"><td colspan="7" class="text-muted">Nenhuma denúncia encontrada.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>

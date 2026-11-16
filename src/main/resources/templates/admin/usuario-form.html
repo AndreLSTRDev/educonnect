@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Usuário')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-4">
+    <div th:replace="~{fragments :: mensagens}"></div>
+    <h1 class="h3 mb-3" th:text="${usuario == null} ? 'Novo usuário' : 'Editar usuário'">Usuário</h1>
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted small"><span class="req" aria-hidden="true">*</span> campo obrigatório</p>
+            <form method="post"
+                  th:action="${usuario == null} ? @{/admin/usuarios} : @{/admin/usuarios/{id}(id=${usuario.id})}">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label for="perfil" class="form-label">Perfil <span class="req" aria-hidden="true">*</span></label>
+                        <select id="perfil" name="perfil" class="form-select" required th:disabled="${usuario != null}">
+                            <option value="">Selecione...</option>
+                            <option th:each="p : ${perfis}" th:value="${p}" th:text="${p.rotulo}"
+                                    th:selected="${usuario != null and usuario.perfil == p}">Perfil</option>
+                        </select>
+                        <div class="form-text" th:if="${usuario != null}">O perfil não pode ser alterado depois do cadastro.</div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="nome" class="form-label">Nome completo <span class="req" aria-hidden="true">*</span></label>
+                        <input id="nome" name="nome" class="form-control" required maxlength="150"
+                               th:value="${usuario != null} ? ${usuario.nomeCompleto}">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="identificador" class="form-label">Identificador institucional <span class="req" aria-hidden="true">*</span></label>
+                        <input id="identificador" name="identificador" class="form-control" required maxlength="40"
+                               th:value="${usuario != null} ? ${usuario.identificadorInstitucional}">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="email" class="form-label">E-mail</label>
+                        <input id="email" name="email" type="email" class="form-control" maxlength="150"
+                               th:value="${usuario != null} ? ${usuario.email}">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="complemento" class="form-label">Matrícula (aluno) / Registro funcional (professor)</label>
+                        <input id="complemento" name="complemento" class="form-control" maxlength="30"
+                               th:value="${usuario != null and usuario.perfil.name() == 'ALUNO'} ? ${usuario.matricula}
+                                        : (${usuario != null and usuario.perfil.name() == 'PROFESSOR'} ? ${usuario.registroFuncional})">
+                        <div class="form-text">Se vazio, usa o identificador institucional.</div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="senha" class="form-label">
+                            <span th:text="${usuario == null} ? 'Senha' : 'Nova senha (deixe em branco para manter)'">Senha</span>
+                            <span class="req" aria-hidden="true" th:if="${usuario == null}">*</span>
+                        </label>
+                        <input id="senha" name="senha" type="password" class="form-control" minlength="8"
+                               th:required="${usuario == null}" autocomplete="new-password">
+                        <div class="form-text">Mínimo de 8 caracteres.</div>
+                    </div>
+                </div>
+                <input type="hidden" name="perfil" th:if="${usuario != null}" th:value="${usuario.perfil}">
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/admin/usuarios}">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>

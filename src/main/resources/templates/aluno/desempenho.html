@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Desempenho')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-4">
+    <div th:replace="~{fragments :: mensagens}"></div>
+    <h1 class="h3 mb-3">Meu desempenho</h1>
+
+    <form method="get" class="row g-2 align-items-end mb-3" th:action="@{/aluno/desempenho}" th:unless="${periodos.isEmpty()}">
+        <div class="col-auto">
+            <label for="periodo" class="form-label">Período</label>
+            <select id="periodo" name="periodo" class="form-select">
+                <option th:each="p : ${periodos}" th:value="${p}" th:text="${p}" th:selected="${p == periodo}">2026.1</option>
+            </select>
+        </div>
+        <div class="col-auto"><button type="submit" class="btn btn-outline-secondary">Consultar</button></div>
+    </form>
+
+    <p class="text-muted" th:if="${linhas.isEmpty()}">Você ainda não está vinculado a nenhuma turma.</p>
+
+    <div class="card" th:unless="${linhas.isEmpty()}">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <caption class="visually-hidden">Desempenho por disciplina no período selecionado</caption>
+                <thead><tr><th scope="col">Disciplina</th><th scope="col">Média</th><th scope="col">Frequência</th><th scope="col">Situação</th></tr></thead>
+                <tbody>
+                <tr th:each="l : ${linhas}">
+                    <td><span th:text="${l.nomeDisciplina()}">Disciplina</span>
+                        <small class="text-muted d-block" th:text="${l.codigoDisciplina()} + ' · ' + ${l.cargaHoraria()} + ' h'">COD</small></td>
+                    <td th:text="${l.media() != null} ? ${#numbers.formatDecimal(l.media(), 1, 1, 'COMMA')} : 'Sem notas'">–</td>
+                    <td th:text="${l.frequencia() != null} ? ${#numbers.formatDecimal(l.frequencia(), 1, 1, 'COMMA')} + '%' : 'Sem registros'">–</td>
+                    <td><span class="badge" th:classappend="'text-bg-' + ${l.situacao().cor}" th:text="${l.situacao().rotulo}">Situação</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <p class="mt-3" th:if="${mediaGeral != null}">
+        Média geral do período:
+        <strong th:text="${#numbers.formatDecimal(mediaGeral, 1, 1, 'COMMA')}">0,0</strong>
+    </p>
+    <p class="form-text">A situação final (aprovado/reprovado) só é definida quando a turma é encerrada.</p>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>

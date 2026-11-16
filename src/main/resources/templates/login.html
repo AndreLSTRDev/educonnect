@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Entrar')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-5">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h1 class="h4 mb-3">Entrar no EduConnect</h1>
+                    <div th:if="${param.erro}" class="alert alert-danger" role="alert">
+                        Identificador ou senha inválidos, ou usuário desativado. Confira os dados e tente novamente.
+                    </div>
+                    <div th:if="${param.saiu}" class="alert alert-info" role="status">Você saiu do sistema.</div>
+                    <p class="text-muted small"><span class="req" aria-hidden="true">*</span> campo obrigatório</p>
+                    <form th:action="@{/login}" method="post">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Identificador institucional <span class="req" aria-hidden="true">*</span></label>
+                            <input id="username" name="username" type="text" class="form-control" required autofocus autocomplete="username">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Senha <span class="req" aria-hidden="true">*</span></label>
+                            <input id="password" name="password" type="password" class="form-control" required autocomplete="current-password">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>
