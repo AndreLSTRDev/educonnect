@@ -1,0 +1,8 @@
+target/
+data/
+logs/
+backups/
+keystore.p12
+.idea/
+*.iml
+.vscode/
