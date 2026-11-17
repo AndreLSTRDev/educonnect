@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,6 +23,22 @@ public class GlobalControllerAdvice {
     public UsuarioLogado logado(@AuthenticationPrincipal UsuarioLogado usuario) {
         return usuario;
     }
+
+    /** Identidade visual (nome, slogan e logo), configurável em application.properties. */
+    @ModelAttribute("marca")
+    public Marca marca(@Value("${educonnect.marca.nome:EduConnect}") String nome,
+                       @Value("${educonnect.marca.slogan:Gestão acadêmica conectada}") String slogan,
+                       @Value("${educonnect.marca.logo:}") String logo) {
+        return new Marca(nome, slogan, logo);
+    }
+
+    /** Caminho da página atual, usado para destacar o item ativo do menu. */
+    @ModelAttribute("caminhoAtual")
+    public String caminhoAtual(HttpServletRequest request) {
+        return request.getRequestURI().substring(request.getContextPath().length());
+    }
+
+    public record Marca(String nome, String slogan, String logo) { }
 
     /**
      * Regras de negócio violadas voltam para a página anterior com a mensagem de erro (RNF-U.4).

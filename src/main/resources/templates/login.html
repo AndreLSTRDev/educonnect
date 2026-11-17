@@ -3,33 +3,54 @@
 <head th:replace="~{fragments :: head('Entrar')}"></head>
 <body>
 <header th:replace="~{fragments :: nav}"></header>
-<main id="conteudo" class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-5">
-            <div class="card">
-                <div class="card-body p-4">
-                    <h1 class="h4 mb-3">Entrar no EduConnect</h1>
-                    <div th:if="${param.erro}" class="alert alert-danger" role="alert">
-                        Identificador ou senha inválidos, ou usuário desativado. Confira os dados e tente novamente.
-                    </div>
-                    <div th:if="${param.saiu}" class="alert alert-info" role="status">Você saiu do sistema.</div>
-                    <p class="text-muted small"><span class="req" aria-hidden="true">*</span> campo obrigatório</p>
-                    <form th:action="@{/login}" method="post">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Identificador institucional <span class="req" aria-hidden="true">*</span></label>
-                            <input id="username" name="username" type="text" class="form-control" required autofocus autocomplete="username">
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Senha <span class="req" aria-hidden="true">*</span></label>
-                            <input id="password" name="password" type="password" class="form-control" required autocomplete="current-password">
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Entrar</button>
-                    </form>
-                </div>
+<main id="conteudo" class="container py-4 py-md-5 ec-login">
+    <div class="ec-login-caixa">
+        <section class="ec-login-hero" aria-label="Sobre o sistema">
+            <th:block th:replace="~{fragments :: simbolo(64, 'ec-logo-login')}"></th:block>
+            <h2 th:text="${marca.slogan}">Gestão acadêmica conectada</h2>
+            <p>Notas, frequência, histórico e denúncias em um só lugar, com acesso de acordo com o seu perfil.</p>
+            <ul>
+                <li><i class="bi bi-mortarboard" aria-hidden="true"></i> Desempenho e histórico do aluno</li>
+                <li><i class="bi bi-journal-check" aria-hidden="true"></i> Lançamento de notas e frequência</li>
+                <li><i class="bi bi-shield-lock" aria-hidden="true"></i> Canal de denúncias com protocolo</li>
+            </ul>
+        </section>
+
+        <section class="ec-login-form">
+            <h1>Entrar</h1>
+            <p class="text-muted mb-4">Use seu identificador institucional e senha.</p>
+            <div th:if="${param.erro}" class="alert alert-danger d-flex gap-2" role="alert">
+                <i class="bi bi-exclamation-octagon" aria-hidden="true"></i>
+                <span>Identificador ou senha inválidos, ou usuário desativado. Confira os dados e tente novamente.</span>
             </div>
-        </div>
+            <div th:if="${param.saiu}" class="alert alert-info d-flex gap-2" role="status">
+                <i class="bi bi-info-circle" aria-hidden="true"></i><span>Você saiu do sistema.</span>
+            </div>
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Identificador institucional <span class="req" aria-hidden="true">*</span></label>
+                    <div class="ec-input-icone">
+                        <i class="bi bi-person" aria-hidden="true"></i>
+                        <input id="username" name="username" type="text" class="form-control" required autofocus
+                               autocomplete="username" placeholder="ex.: aluno1">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Senha <span class="req" aria-hidden="true">*</span></label>
+                    <div class="ec-input-icone">
+                        <i class="bi bi-lock" aria-hidden="true"></i>
+                        <input id="password" name="password" type="password" class="form-control" required
+                               autocomplete="current-password">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">
+                    Entrar <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></button>
+                <p class="text-muted small mt-3 mb-0"><span class="req" aria-hidden="true">*</span> campo obrigatório</p>
+            </form>
+        </section>
     </div>
 </main>
+<footer th:replace="~{fragments :: rodape}"></footer>
 <script th:replace="~{fragments :: scripts}"></script>
 <script th:replace="~{fragments :: app}"></script>
 </body>

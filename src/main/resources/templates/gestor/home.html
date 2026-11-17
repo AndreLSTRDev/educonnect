@@ -5,7 +5,10 @@
 <header th:replace="~{fragments :: nav}"></header>
 <main id="conteudo" class="container py-4">
     <div th:replace="~{fragments :: mensagens}"></div>
-    <h1 class="h3 mb-3">Gerenciar denúncias</h1>
+    <div class="ec-boas-vindas">
+        <h1>Gerenciar denúncias</h1>
+        <p>Analise as denúncias registradas, atualize o status e mantenha o histórico de cada caso.</p>
+    </div>
 
     <form method="get" class="row g-2 align-items-end mb-3" th:action="@{/gestor}">
         <div class="col-auto">
@@ -15,7 +18,7 @@
                 <option th:each="s : ${todosStatus}" th:value="${s}" th:text="${s.rotulo}" th:selected="${s == statusFiltro}">S</option>
             </select>
         </div>
-        <div class="col-auto"><button type="submit" class="btn btn-outline-secondary">Filtrar</button></div>
+        <div class="col-auto"><button type="submit" class="btn btn-outline-secondary"><i class="bi bi-funnel me-1" aria-hidden="true"></i>Filtrar</button></div>
     </form>
 
     <div class="card">
@@ -40,6 +43,7 @@
         </div>
     </div>
 </main>
+<footer th:replace="~{fragments :: rodape}"></footer>
 <script th:replace="~{fragments :: scripts}"></script>
 <script th:replace="~{fragments :: app}"></script>
 </body>

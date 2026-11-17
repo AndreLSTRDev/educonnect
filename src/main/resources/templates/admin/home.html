@@ -5,30 +5,54 @@
 <header th:replace="~{fragments :: nav}"></header>
 <main id="conteudo" class="container py-4">
     <div th:replace="~{fragments :: mensagens}"></div>
-    <h1 class="h3 mb-4">Painel administrativo</h1>
+    <div class="ec-boas-vindas">
+        <h1>Painel administrativo</h1>
+        <p>Gerencie usuários, cursos, disciplinas e turmas da instituição.</p>
+    </div>
     <div class="row g-3">
         <div class="col-12 col-sm-6 col-lg-3">
-            <a class="card text-decoration-none h-100" th:href="@{/admin/usuarios}">
-                <div class="card-body"><div class="display-6" th:text="${totalUsuarios}">0</div>Usuários</div>
+            <a class="card ec-atalho text-decoration-none h-100" th:href="@{/admin/usuarios}">
+                <div class="card-body">
+                    <span class="ec-icone"><i class="bi bi-people" aria-hidden="true"></i></span>
+                    <span class="ec-numero" th:text="${totalUsuarios}">0</span>
+                    <span class="ec-rotulo">Usuários</span>
+                    <span class="ec-seta">Gerenciar <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+                </div>
             </a>
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
-            <a class="card text-decoration-none h-100" th:href="@{/admin/cursos}">
-                <div class="card-body"><div class="display-6" th:text="${totalCursos}">0</div>Cursos</div>
+            <a class="card ec-atalho text-decoration-none h-100" th:href="@{/admin/cursos}">
+                <div class="card-body">
+                    <span class="ec-icone verde"><i class="bi bi-mortarboard" aria-hidden="true"></i></span>
+                    <span class="ec-numero" th:text="${totalCursos}">0</span>
+                    <span class="ec-rotulo">Cursos</span>
+                    <span class="ec-seta">Gerenciar <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+                </div>
             </a>
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
-            <a class="card text-decoration-none h-100" th:href="@{/admin/cursos}">
-                <div class="card-body"><div class="display-6" th:text="${totalDisciplinas}">0</div>Disciplinas</div>
+            <a class="card ec-atalho text-decoration-none h-100" th:href="@{/admin/cursos}">
+                <div class="card-body">
+                    <span class="ec-icone laranja"><i class="bi bi-journal-bookmark" aria-hidden="true"></i></span>
+                    <span class="ec-numero" th:text="${totalDisciplinas}">0</span>
+                    <span class="ec-rotulo">Disciplinas</span>
+                    <span class="ec-seta">Gerenciar <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+                </div>
             </a>
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
-            <a class="card text-decoration-none h-100" th:href="@{/admin/turmas}">
-                <div class="card-body"><div class="display-6" th:text="${totalTurmas}">0</div>Turmas</div>
+            <a class="card ec-atalho text-decoration-none h-100" th:href="@{/admin/turmas}">
+                <div class="card-body">
+                    <span class="ec-icone rosa"><i class="bi bi-diagram-3" aria-hidden="true"></i></span>
+                    <span class="ec-numero" th:text="${totalTurmas}">0</span>
+                    <span class="ec-rotulo">Turmas</span>
+                    <span class="ec-seta">Gerenciar <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+                </div>
             </a>
         </div>
     </div>
 </main>
+<footer th:replace="~{fragments :: rodape}"></footer>
 <script th:replace="~{fragments :: scripts}"></script>
 <script th:replace="~{fragments :: app}"></script>
 </body>

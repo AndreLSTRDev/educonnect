@@ -1,0 +1,26 @@
+<!--
+  EduConnect - logo completa (símbolo + nome), para relatório, slides e README.
+  Cores: stop-color do degradê e fill dos textos. Fonte: Inter (cai para Arial/sans-serif).
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 64" width="600" height="128">
+  <defs>
+    <linearGradient id="ec-grad-c" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4f46e5"/>
+      <stop offset="1" stop-color="#0d9488"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(8 8)">
+    <rect width="48" height="48" rx="13" fill="url(#ec-grad-c)"/>
+    <path d="M33 14.5 L29.5 24 L33 33.5" fill="none" stroke="#fff" stroke-opacity=".55"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="12" y="12" width="4.5" height="24" rx="2.25" fill="#fff"/>
+    <rect x="12" y="12" width="17" height="4.5" rx="2.25" fill="#fff"/>
+    <rect x="12" y="21.75" width="13.5" height="4.5" rx="2.25" fill="#fff"/>
+    <rect x="12" y="31.5" width="17" height="4.5" rx="2.25" fill="#fff"/>
+    <circle cx="33" cy="14.25" r="3.6" fill="#fff"/>
+    <circle cx="29.5" cy="24" r="3.6" fill="#fff"/>
+    <circle cx="33" cy="33.75" r="3.6" fill="#fff"/>
+  </g>
+  <text x="70" y="38" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700" fill="#1e1b4b">Edu<tspan fill="#0d9488">Connect</tspan></text>
+  <text x="71" y="54" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="500" fill="#64748b" letter-spacing=".4">Gestão acadêmica conectada</text>
+</svg>

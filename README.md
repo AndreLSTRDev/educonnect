@@ -31,6 +31,16 @@ mvn spring-boot:run -Dspring-boot.run.profiles=https     # https://localhost:844
 ```
 Em produção, use um certificado válido e a variável `KEYSTORE_PASSWORD`.
 
+## Identidade visual (logo e cores)
+
+| O que mudar | Onde |
+|---|---|
+| Cores da logo e do tema | variáveis no início de `src/main/resources/static/css/app.css` (`--ec-logo-cor-1`, `--ec-logo-cor-2`, `--ec-primaria`...) |
+| Nome e slogan | `educonnect.marca.nome` e `educonnect.marca.slogan` em `application.properties` (acentos como `ã`) |
+| Trocar a logo por outra imagem | coloque o arquivo em `static/img/` e defina `educonnect.marca.logo=/img/arquivo.png` (vazio = símbolo SVG padrão) |
+| Desenho do símbolo | fragmento `simbolo` em `templates/fragments.html` |
+| Logo para documentos e slides | `static/img/logo-completa.svg` e `static/img/logo-simbolo.svg` |
+
 ## Mapa dos requisitos
 
 | Requisito | Onde está |
