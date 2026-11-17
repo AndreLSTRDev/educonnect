@@ -182,6 +182,7 @@ a.card:focus-visible { outline: 3px solid rgba(var(--ec-primaria-rgb), .45); out
 /* ---------- Formulários ---------- */
 .form-label { font-weight: 600; font-size: .88rem; color: #334155; margin-bottom: .35rem; }
 .form-control, .form-select { border-radius: 10px; border-color: #d9dce8; padding: .55rem .8rem; }
+.form-select { padding-right: 2.4rem; min-width: 8rem; }
 .form-control:focus, .form-select:focus { border-color: var(--ec-primaria); box-shadow: 0 0 0 .2rem var(--bs-focus-ring-color); }
 .form-check-input:checked { background-color: var(--ec-primaria); border-color: var(--ec-primaria); }
 
