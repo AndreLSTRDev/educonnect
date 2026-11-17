@@ -9,6 +9,26 @@
         <h1 class="h3 mb-0">Usuários</h1>
         <a class="btn btn-primary" th:href="@{/admin/usuarios/novo}">Novo usuário</a>
     </div>
+    <form method="get" class="row g-2 align-items-end mb-3" th:action="@{/admin/usuarios}" role="search">
+        <div class="col-12 col-md-5">
+            <label for="busca" class="form-label">Buscar</label>
+            <div class="ec-input-icone">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <input id="busca" name="busca" type="search" class="form-control" th:value="${busca}"
+                       placeholder="Nome, identificador ou e-mail">
+            </div>
+        </div>
+        <div class="col-8 col-md-3">
+            <label for="perfil" class="form-label">Perfil</label>
+            <select id="perfil" name="perfil" class="form-select">
+                <option value="">Todos</option>
+                <option th:each="p : ${perfis}" th:value="${p}" th:text="${p.rotulo}" th:selected="${p == perfilFiltro}">Perfil</option>
+            </select>
+        </div>
+        <div class="col-auto"><button type="submit" class="btn btn-outline-secondary"><i class="bi bi-funnel me-1" aria-hidden="true"></i>Filtrar</button></div>
+        <div class="col-auto" th:if="${busca != null and !busca.isBlank() or perfilFiltro != null}">
+            <a class="btn btn-link" th:href="@{/admin/usuarios}">Limpar</a></div>
+    </form>
     <div class="card">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
@@ -39,6 +59,7 @@
                         </form>
                     </td>
                 </tr>
+                <tr th:if="${usuarios.isEmpty()}"><td colspan="5" class="text-muted">Nenhum usuário encontrado com esses filtros.</td></tr>
                 </tbody>
             </table>
         </div>

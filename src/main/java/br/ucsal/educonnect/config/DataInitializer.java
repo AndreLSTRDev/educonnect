@@ -48,7 +48,7 @@ public class DataInitializer implements CommandLineRunner {
 
         Curso curso = cadastro.criarCurso("Engenharia de Software");
         Disciplina disc = cadastro.criarDisciplina(curso.getId(), "Engenharia de Requisitos", "ESW101", "60");
-        Turma turma = cadastro.criarTurma(disc.getId(), prof.getId(), "T01", "2026.1");
+        Turma turma = cadastro.criarTurma(disc.getId(), prof.getId(), "T01", "2026.1", "B-204");
         cadastro.vincularAluno(turma.getId(), aluno1.getId());
         cadastro.vincularAluno(turma.getId(), aluno2.getId());
         log.info("Dados de demonstração criados (logins: admin, prof, aluno1, aluno2, gestor).");

@@ -19,7 +19,10 @@ public class UsuarioDetailsService implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String identificador) throws UsernameNotFoundException {
-        return usuarioRepository.findByIdentificadorInstitucionalIgnoreCase(identificador == null ? "" : identificador.trim())
+        String chave = identificador == null ? "" : identificador.trim();
+        // Pedido do cliente (validação do RF01): entrar com o identificador institucional ou com o e-mail.
+        return usuarioRepository.findByIdentificadorInstitucionalIgnoreCase(chave)
+                .or(() -> usuarioRepository.findFirstByEmailIgnoreCase(chave))
                 .map(UsuarioLogado::new)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
     }

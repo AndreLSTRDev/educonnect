@@ -23,7 +23,7 @@
             <div class="table-responsive">
                 <table class="table mb-0">
                     <caption class="visually-hidden">Presença dos alunos na data selecionada</caption>
-                    <thead><tr><th scope="col">Aluno</th><th scope="col">Presente?</th></tr></thead>
+                    <thead><tr><th scope="col">Aluno</th><th scope="col">Presente?</th><th scope="col">Justificativa da falta</th></tr></thead>
                     <tbody>
                     <tr th:each="a : ${turma.alunos}">
                         <td th:text="${a.nomeCompleto}">Aluno</td>
@@ -34,12 +34,18 @@
                                 <label class="form-check-label" th:for="'p_' + ${a.id}">Presente</label>
                             </div>
                         </td>
+                        <td>
+                            <label class="visually-hidden" th:for="'just_' + ${a.id}" th:text="'Justificativa da falta de ' + ${a.nomeCompleto}">Justificativa</label>
+                            <input class="form-control form-control-sm" th:id="'just_' + ${a.id}" th:name="'just_' + ${a.id}"
+                                   maxlength="200" th:value="${justificativas[a.id]}" placeholder="Ex.: atestado médico">
+                        </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-        <p class="form-text">Alunos desmarcados são registrados como ausentes na data de <strong th:text="${#temporals.format(data, 'dd/MM/yyyy')}">data</strong>.</p>
+        <p class="form-text">Alunos desmarcados são registrados como ausentes na data de <strong th:text="${#temporals.format(data, 'dd/MM/yyyy')}">data</strong>.
+            A justificativa (atestado, por exemplo) fica registrada e aparece para o aluno, mas a falta continua contando na frequência.</p>
         <button type="submit" class="btn btn-primary">Salvar frequência</button>
     </form>
 </main>

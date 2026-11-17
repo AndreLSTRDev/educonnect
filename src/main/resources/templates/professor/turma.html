@@ -7,7 +7,24 @@
     <div th:replace="~{fragments :: mensagens}"></div>
     <a th:href="@{/professor}" class="small">&larr; Minhas turmas</a>
     <h1 class="h3 my-3" th:text="${turma.disciplina.nome} + ' – turma ' + ${turma.codigo} + ' (' + ${turma.periodo} + ')'">Turma</h1>
-    <p><a class="btn btn-outline-primary btn-sm" th:href="@{/professor/turmas/{id}/frequencia(id=${turma.id})}">Registrar frequência</a></p>
+    <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+        <span class="badge" th:classappend="${turma.encerrada} ? 'text-bg-secondary' : 'text-bg-success'"
+              th:text="${turma.encerrada} ? 'Encerrada' : 'Em andamento'">Status</span>
+        <span class="small text-muted" th:if="${turma.sala}"><i class="bi bi-door-open" aria-hidden="true"></i>
+            Sala <strong th:text="${turma.sala}">B-204</strong></span>
+        <span class="small text-muted" th:unless="${turma.professoresAdicionais.isEmpty()}">
+            <i class="bi bi-people" aria-hidden="true"></i> Professores:
+            <span th:text="${turma.professor.nomeCompleto}">Prof</span><span th:each="p : ${turma.professoresAdicionais}" th:text="', ' + ${p.nomeCompleto}"></span>
+        </span>
+        <span class="ms-auto"></span>
+        <a class="btn btn-outline-primary btn-sm" th:href="@{/professor/turmas/{id}/frequencia(id=${turma.id})}">
+            <i class="bi bi-calendar-check" aria-hidden="true"></i> Registrar frequência</a>
+        <!-- Pedido do cliente (RF04): quem encerra a turma é o professor -->
+        <form method="post" th:action="@{/professor/turmas/{id}/encerrar(id=${turma.id})}" th:unless="${turma.encerrada}"
+              data-confirmar="Encerrar a turma? A situação final (aprovado/reprovado) passa a valer para os alunos e não pode ser desfeita.">
+            <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-lock" aria-hidden="true"></i> Encerrar turma</button>
+        </form>
+    </div>
 
     <div class="row g-3">
         <div class="col-12 col-lg-5">

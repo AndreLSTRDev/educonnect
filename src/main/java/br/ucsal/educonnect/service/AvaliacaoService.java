@@ -49,7 +49,7 @@ public class AvaliacaoService {
     public Avaliacao avaliacaoDoProfessor(Long professorId, Long avaliacaoId) {
         Avaliacao a = avaliacoes.findById(avaliacaoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Avaliação não encontrada."));
-        if (a.getTurma().getProfessor() == null || !a.getTurma().getProfessor().getId().equals(professorId)) {
+        if (!a.getTurma().temProfessor(professorId)) {
             throw new AccessDeniedException("Avaliação pertence a outro professor.");
         }
         return a;

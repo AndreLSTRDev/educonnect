@@ -40,6 +40,14 @@ public class GlobalControllerAdvice {
 
     public record Marca(String nome, String slogan, String logo) { }
 
+    /** Anexo maior que o limite configurado (spring.servlet.multipart.*). */
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public String arquivoGrande(HttpServletRequest request) {
+        RequestContextUtils.getOutputFlashMap(request).put("erro",
+                "Os arquivos enviados passam do limite (5 MB por arquivo, 16 MB no total). Reduza e tente de novo.");
+        return "redirect:" + destinoDeRetorno(request);
+    }
+
     /**
      * Regras de negócio violadas voltam para a página anterior com a mensagem de erro (RNF-U.4).
      * Só o caminho do Referer é reaproveitado, evitando redirecionamento para sites externos.

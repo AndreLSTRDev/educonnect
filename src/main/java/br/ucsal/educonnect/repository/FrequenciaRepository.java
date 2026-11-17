@@ -15,4 +15,9 @@ public interface FrequenciaRepository extends JpaRepository<RegistroFrequencia, 
     long countByTurmaIdAndAlunoId(Long turmaId, Long alunoId);
 
     long countByTurmaIdAndAlunoIdAndPresenteTrue(Long turmaId, Long alunoId);
+
+    long countByTurmaIdAndAlunoIdAndPresenteFalse(Long turmaId, Long alunoId);
+
+    long countByTurmaIdAndAlunoIdAndPresenteFalseAndJustificativaIsNotNull(Long turmaId, Long alunoId);
+
 }

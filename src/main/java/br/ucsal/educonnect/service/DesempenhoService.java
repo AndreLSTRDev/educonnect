@@ -67,6 +67,25 @@ public class DesempenhoService {
                 .toList();
     }
 
+    /** Um ponto do gráfico de evolução: a nota de uma avaliação convertida para a escala da instituição. */
+    public record PontoEvolucao(String avaliacao, String data, double nota) { }
+
+    /** Uma linha do gráfico de evolução (uma por disciplina). */
+    public record SerieEvolucao(String disciplina, List<PontoEvolucao> pontos) { }
+
+    /** Pedido do cliente (validação do RF07): gráfico de evolução das notas no período. */
+    @Transactional(readOnly = true)
+    public List<SerieEvolucao> evolucao(Long alunoId, String periodo) {
+        return desempenho(alunoId, periodo).stream()
+                .map(l -> new SerieEvolucao(l.nomeDisciplina(), notasDaTurma(alunoId, l.turmaId()).stream()
+                        .map(n -> new PontoEvolucao(n.getAvaliacao().getNome(),
+                                n.getAvaliacao().getDataAvaliacao().toString(),
+                                arredondar(n.getValor() / n.getAvaliacao().getValorMaximo() * escalaMaxima)))
+                        .toList()))
+                .filter(s -> !s.pontos().isEmpty())
+                .toList();
+    }
+
     /**
      * Média da turma na escala da instituição: soma das notas dividida pela soma dos valores
      * máximos das avaliações já corrigidas, multiplicada pela escala. Nulo se não há notas.
@@ -97,6 +116,13 @@ public class DesempenhoService {
 
     SituacaoDisciplina situacao(boolean turmaEncerrada, Double media, Double freq) {
         if (!turmaEncerrada) {
+            // Pedido do cliente (validação do RF07): mostrar a situação parcial enquanto a turma está aberta.
+            if (freq != null && freq < frequenciaMinima) {
+                return SituacaoDisciplina.EM_RISCO_POR_FALTA;
+            }
+            if (media != null && media < mediaMinima) {
+                return SituacaoDisciplina.EM_RISCO_POR_NOTA;
+            }
             return SituacaoDisciplina.EM_ANDAMENTO;
         }
         if (freq != null && freq < frequenciaMinima) {
@@ -114,6 +140,7 @@ public class DesempenhoService {
         Double freqArredondada = freq == null ? null : arredondar(freq);
         return new LinhaDesempenho(t.getId(), t.getDisciplina().getCodigo(), t.getDisciplina().getNome(),
                 t.getDisciplina().getCargaHoraria(), t.getPeriodo(), media, freqArredondada,
+                frequencia.faltas(t.getId(), alunoId), frequencia.faltasJustificadas(t.getId(), alunoId),
                 situacao(t.isEncerrada(), media, freq));
     }
 

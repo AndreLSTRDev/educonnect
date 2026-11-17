@@ -31,6 +31,24 @@ mvn spring-boot:run -Dspring-boot.run.profiles=https     # https://localhost:844
 ```
 Em produção, use um certificado válido e a variável `KEYSTORE_PASSWORD`.
 
+## Versão final: ajustes pedidos pelos clientes
+
+A branch `final` aplica o que os clientes responderam no formulário de validação das telas (RF01 a RF10):
+
+| Requisito | Ajuste |
+|---|---|
+| RF01 | Login com identificador **ou e-mail**; "Esqueci minha senha" com link de uso único (30 min); menu **Aparência** com tema claro, escuro ou do sistema e três cores de destaque |
+| RF02 | Busca por nome, identificador ou e-mail e filtro por perfil na lista de usuários; e-mail único |
+| RF03 | Ementa e pré-requisitos na disciplina; editar e excluir disciplinas; renomear e excluir cursos (com bloqueio quando há dependências) |
+| RF04 | Sala da turma; mais de um professor por turma; remover aluno (sem notas nem frequência); só o professor da turma encerra a turma |
+| RF06 | Justificativa de falta (ex.: atestado) por aluno e data |
+| RF07 | Coluna de faltas; notas de cada avaliação; gráfico de evolução; situação parcial "Em risco por nota/falta" |
+| RF08 | Histórico agrupado por período; botão "Imprimir ou salvar em PDF" |
+| RF09 | Categorias Assédio e Discriminação; denúncia anônima; até 3 anexos (imagens ou PDF, 5 MB cada) |
+| RF10 | Comentário obrigatório; aviso por e-mail ao aluno; filtros por categoria, período, aluno e protocolo |
+
+E-mails: sem `spring.mail.host` configurado, as mensagens (aviso de status e link de nova senha) são gravadas em `logs/educonnect.log`. Para enviar de verdade, preencha as propriedades `spring.mail.*` comentadas em `application.properties`.
+
 ## Identidade visual (logo e cores)
 
 | O que mudar | Onde |

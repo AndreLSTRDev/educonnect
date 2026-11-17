@@ -13,8 +13,17 @@
         </div>
         <p class="text-muted mb-2">Protocolo <strong th:text="${denuncia.protocolo}">EDU</strong>
             · <span th:text="${denuncia.categoria.rotulo}">Cat</span>
-            · <span th:text="${#temporals.format(denuncia.dataAbertura, 'dd/MM/yyyy HH:mm')}">data</span></p>
+            · <span th:text="${#temporals.format(denuncia.dataAbertura, 'dd/MM/yyyy HH:mm')}">data</span>
+            <span class="badge text-bg-secondary ms-1" th:if="${denuncia.anonima}"><i class="bi bi-incognito" aria-hidden="true"></i> Anônima</span></p>
         <p style="white-space: pre-wrap" th:text="${denuncia.descricao}">Descrição</p>
+        <div th:unless="${denuncia.anexos.isEmpty()}">
+            <h2 class="h6">Anexos</h2>
+            <ul class="list-unstyled mb-0">
+                <li th:each="a : ${denuncia.anexos}"><i class="bi bi-paperclip" aria-hidden="true"></i>
+                    <a th:href="@{/aluno/anexos/{id}(id=${a.id})}" th:text="${a.nomeArquivo}">arquivo.pdf</a>
+                    <span class="text-muted small" th:text="'(' + ${a.tamanhoFormatado} + ')'">(10 KB)</span></li>
+            </ul>
+        </div>
     </div></div>
 
     <h2 class="h5">Andamento</h2>

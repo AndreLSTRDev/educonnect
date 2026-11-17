@@ -37,6 +37,19 @@ public class UsuarioService {
         return repository.findAllByOrderByNomeCompletoAsc();
     }
 
+    /** Pedido do cliente (validação do RF02): busca por nome/identificador/e-mail e filtro por perfil. */
+    @Transactional(readOnly = true)
+    public List<Usuario> listar(String busca, Perfil perfil) {
+        String termo = busca == null ? "" : busca.trim().toLowerCase(java.util.Locale.ROOT);
+        return listar().stream()
+                .filter(u -> perfil == null || u.getPerfil() == perfil)
+                .filter(u -> termo.isEmpty()
+                        || u.getNomeCompleto().toLowerCase(java.util.Locale.ROOT).contains(termo)
+                        || u.getIdentificadorInstitucional().toLowerCase(java.util.Locale.ROOT).contains(termo)
+                        || (u.getEmail() != null && u.getEmail().toLowerCase(java.util.Locale.ROOT).contains(termo)))
+                .toList();
+    }
+
     @Transactional(readOnly = true)
     public Usuario buscar(Long id) {
         return repository.findById(id)
@@ -54,6 +67,9 @@ public class UsuarioService {
         if (repository.existsByIdentificadorInstitucionalIgnoreCase(idf)) {
             throw new RegraNegocioException("O identificador institucional \"" + idf
                     + "\" já está em uso. Informe um identificador diferente.");
+        }
+        if (email != null && !email.isBlank() && repository.existsByEmailIgnoreCase(email.trim())) {
+            throw new RegraNegocioException("O e-mail \"" + email.trim() + "\" já está em uso por outro usuário.");
         }
         Usuario u = switch (perfil) {
             case ALUNO -> new Aluno();
@@ -80,6 +96,13 @@ public class UsuarioService {
                     throw new RegraNegocioException("O identificador institucional \"" + idf
                             + "\" já pertence a outro usuário.");
                 });
+        if (email != null && !email.isBlank()) {
+            repository.findFirstByEmailIgnoreCase(email.trim())
+                    .filter(outro -> !outro.getId().equals(id))
+                    .ifPresent(outro -> {
+                        throw new RegraNegocioException("O e-mail \"" + email.trim() + "\" já está em uso por outro usuário.");
+                    });
+        }
         u.setNomeCompleto(nome.trim());
         u.setIdentificadorInstitucional(idf);
         u.setEmail(opcional(email));
@@ -112,7 +135,7 @@ public class UsuarioService {
         return idf;
     }
 
-    private void validarSenha(String senha) {
+    void validarSenha(String senha) {
         if (senha == null || senha.length() < TAMANHO_MINIMO_SENHA) {
             throw new RegraNegocioException("A senha deve ter pelo menos " + TAMANHO_MINIMO_SENHA + " caracteres.");
         }

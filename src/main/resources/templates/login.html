@@ -18,25 +18,31 @@
 
         <section class="ec-login-form">
             <h1>Entrar</h1>
-            <p class="text-muted mb-4">Use seu identificador institucional e senha.</p>
+            <p class="text-muted mb-4">Use seu identificador institucional ou e-mail e a sua senha.</p>
             <div th:if="${param.erro}" class="alert alert-danger d-flex gap-2" role="alert">
                 <i class="bi bi-exclamation-octagon" aria-hidden="true"></i>
-                <span>Identificador ou senha inválidos, ou usuário desativado. Confira os dados e tente novamente.</span>
+                <span>Identificador, e-mail ou senha inválidos, ou usuário desativado. Confira os dados e tente novamente.</span>
             </div>
             <div th:if="${param.saiu}" class="alert alert-info d-flex gap-2" role="status">
                 <i class="bi bi-info-circle" aria-hidden="true"></i><span>Você saiu do sistema.</span>
             </div>
+            <div th:if="${param.senhaRedefinida}" class="alert alert-success d-flex gap-2" role="status">
+                <i class="bi bi-check-circle" aria-hidden="true"></i><span>Senha redefinida. Entre com a nova senha.</span>
+            </div>
             <form th:action="@{/login}" method="post">
                 <div class="mb-3">
-                    <label for="username" class="form-label">Identificador institucional <span class="req" aria-hidden="true">*</span></label>
+                    <label for="username" class="form-label">Identificador institucional ou e-mail <span class="req" aria-hidden="true">*</span></label>
                     <div class="ec-input-icone">
                         <i class="bi bi-person" aria-hidden="true"></i>
                         <input id="username" name="username" type="text" class="form-control" required autofocus
-                               autocomplete="username" placeholder="ex.: aluno1">
+                               autocomplete="username" placeholder="ex.: aluno1 ou nome@instituicao.br">
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label for="password" class="form-label">Senha <span class="req" aria-hidden="true">*</span></label>
+                    <div class="d-flex justify-content-between align-items-baseline">
+                        <label for="password" class="form-label">Senha <span class="req" aria-hidden="true">*</span></label>
+                        <a class="small" th:href="@{/recuperar-senha}">Esqueci minha senha</a>
+                    </div>
                     <div class="ec-input-icone">
                         <i class="bi bi-lock" aria-hidden="true"></i>
                         <input id="password" name="password" type="password" class="form-control" required

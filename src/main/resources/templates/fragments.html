@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${titulo} + ' – ' + ${marca.nome}">EduConnect</title>
+    <!-- Aplica o tema salvo antes de desenhar a página (evita o "piscar" do tema claro) -->
+    <script>
+        (function () {
+            try {
+                var tema = localStorage.getItem('ec-tema') || 'claro';
+                var cor = localStorage.getItem('ec-cor') || 'indigo';
+                if (tema === 'auto') {
+                    tema = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro';
+                }
+                var raiz = document.documentElement;
+                raiz.setAttribute('data-tema', tema);
+                raiz.setAttribute('data-bs-theme', tema === 'escuro' ? 'dark' : 'light');
+                if (cor !== 'indigo') { raiz.setAttribute('data-cor', cor); }
+            } catch (e) { /* sem localStorage: fica o tema claro */ }
+        })();
+    </script>
     <link rel="icon" type="image/svg+xml" th:href="@{/img/favicon.svg}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,11 +76,31 @@
     <nav class="navbar navbar-expand-lg" aria-label="Navegação principal">
         <div class="container">
             <a th:replace="~{fragments :: marca('ec-logo-nav')}"></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
-                    th:if="${logado != null}"
-                    aria-controls="menu" aria-expanded="false" aria-label="Alternar menu">
-                <i class="bi bi-list" aria-hidden="true"></i>
-            </button>
+            <div class="d-flex align-items-center gap-2 ms-auto order-lg-last">
+                <!-- Pedido do cliente (validação do RF01): modo escuro e troca de tema -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary ec-tema-btn" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false" aria-label="Aparência: tema e cor" title="Aparência">
+                        <i class="bi bi-circle-half" aria-hidden="true"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end ec-tema-menu">
+                        <li><h2 class="dropdown-header">Tema</h2></li>
+                        <li><button class="dropdown-item" type="button" data-ec-tema="claro"><i class="bi bi-sun me-2" aria-hidden="true"></i>Claro</button></li>
+                        <li><button class="dropdown-item" type="button" data-ec-tema="escuro"><i class="bi bi-moon-stars me-2" aria-hidden="true"></i>Escuro</button></li>
+                        <li><button class="dropdown-item" type="button" data-ec-tema="auto"><i class="bi bi-display me-2" aria-hidden="true"></i>Igual ao sistema</button></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h2 class="dropdown-header">Cor de destaque</h2></li>
+                        <li><button class="dropdown-item" type="button" data-ec-cor="indigo"><span class="ec-bolinha me-2" style="background:#4f46e5" aria-hidden="true"></span>Índigo</button></li>
+                        <li><button class="dropdown-item" type="button" data-ec-cor="azul"><span class="ec-bolinha me-2" style="background:#2563eb" aria-hidden="true"></span>Azul</button></li>
+                        <li><button class="dropdown-item" type="button" data-ec-cor="verde"><span class="ec-bolinha me-2" style="background:#0f766e" aria-hidden="true"></span>Verde-água</button></li>
+                    </ul>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
+                        th:if="${logado != null}"
+                        aria-controls="menu" aria-expanded="false" aria-label="Alternar menu">
+                    <i class="bi bi-list" aria-hidden="true"></i>
+                </button>
+            </div>
             <div class="collapse navbar-collapse" id="menu" th:if="${logado != null}">
                 <ul class="navbar-nav mx-lg-auto ec-menu">
                     <li class="nav-item"><a class="nav-link" th:href="@{/painel}"

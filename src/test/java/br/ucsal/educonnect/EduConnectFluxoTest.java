@@ -70,9 +70,9 @@ class EduConnectFluxoTest {
         assertThat(desempenho.calcularMedia(aluno.getId(), turma.getId())).isEqualTo(8.0);
         assertThat(desempenho.calcularMedia(aluno.getId(), "2026.1")).isEqualTo(8.0);
         assertThat(desempenho.desempenho(aluno.getId(), "2026.1")).hasSize(1)
-                .first().satisfies(l -> assertThat(l.situacao()).isEqualTo(SituacaoDisciplina.EM_ANDAMENTO));
+                .first().satisfies(l -> assertThat(l.situacao()).isEqualTo(SituacaoDisciplina.EM_RISCO_POR_FALTA));
 
-        cadastro.encerrarTurma(turma.getId());
+        cadastro.encerrarTurma(prof.getId(), turma.getId());
         assertThat(desempenho.historico(aluno.getId()).get(0).situacao())
                 .isEqualTo(SituacaoDisciplina.REPROVADO_POR_FALTA);
     }

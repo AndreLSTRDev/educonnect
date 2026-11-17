@@ -10,7 +10,13 @@ public interface TurmaRepository extends JpaRepository<Turma, Long> {
 
     List<Turma> findAllByOrderByPeriodoDescCodigoAsc();
 
-    List<Turma> findByProfessorIdOrderByPeriodoDescCodigoAsc(Long professorId);
+    /** Turmas em que o professor é o responsável ou um dos professores adicionais. */
+    @Query("select distinct t from Turma t left join t.professoresAdicionais pa "
+            + "where t.professor.id = :professorId or pa.id = :professorId "
+            + "order by t.periodo desc, t.codigo asc")
+    List<Turma> findDoProfessor(@Param("professorId") Long professorId);
+
+    long countByDisciplinaId(Long disciplinaId);
 
     boolean existsByDisciplinaIdAndCodigoIgnoreCaseAndPeriodo(Long disciplinaId, String codigo, String periodo);
 

@@ -10,7 +10,7 @@
     <div class="card mb-4"><div class="card-body">
         <h2 class="h5">Registrar denúncia</h2>
         <p class="text-muted small"><span class="req" aria-hidden="true">*</span> campo obrigatório</p>
-        <form method="post" th:action="@{/aluno/denuncias}">
+        <form method="post" th:action="@{/aluno/denuncias}" enctype="multipart/form-data">
             <div class="row g-3">
                 <div class="col-12 col-md-8">
                     <label for="titulo" class="form-label">Título <span class="req" aria-hidden="true">*</span></label>
@@ -26,6 +26,23 @@
                 <div class="col-12">
                     <label for="descricao" class="form-label">Descrição <span class="req" aria-hidden="true">*</span></label>
                     <textarea id="descricao" name="descricao" class="form-control" rows="4" required maxlength="2000"></textarea>
+                </div>
+                <!-- Pedido do cliente (RF09): anexar arquivos -->
+                <div class="col-12 col-md-7">
+                    <label for="anexos" class="form-label">Anexos (opcional)</label>
+                    <input id="anexos" name="anexos" type="file" class="form-control" multiple
+                           accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" aria-describedby="ajudaAnexos">
+                    <div id="ajudaAnexos" class="form-text">Até 3 fotos ou PDFs, com no máximo 5 MB cada.</div>
+                </div>
+                <!-- Pedido do cliente (RF09): denúncia anônima -->
+                <div class="col-12 col-md-5">
+                    <span class="form-label d-block">Identidade</span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="anonima" name="anonima" value="true"
+                               aria-describedby="ajudaAnonima">
+                        <label class="form-check-label" for="anonima">Fazer a denúncia de forma anônima</label>
+                    </div>
+                    <div id="ajudaAnonima" class="form-text">O gestor não verá o seu nome. Você continua acompanhando a denúncia pelo protocolo.</div>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary mt-3">Enviar denúncia</button>
