@@ -11,5 +11,7 @@ public record LinhaDesempenho(
         String periodo,
         Double media,
         Double frequencia,
+        long faltas,
+        long faltasJustificadas,
         SituacaoDisciplina situacao) {
 }

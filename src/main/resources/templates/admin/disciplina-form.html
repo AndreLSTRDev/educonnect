@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Editar disciplina')}"></head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main id="conteudo" class="container py-4">
+    <div th:replace="~{fragments :: mensagens}"></div>
+    <a th:href="@{/admin/cursos}" class="small">&larr; Voltar a cursos e disciplinas</a>
+    <h1 class="h3 my-3" th:text="'Editar disciplina ' + ${disciplina.codigo}">Editar disciplina</h1>
+    <div class="card"><div class="card-body">
+        <p class="text-muted small"><span class="req" aria-hidden="true">*</span> campo obrigatório</p>
+        <form method="post" th:action="@{/admin/disciplinas/{id}(id=${disciplina.id})}">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="cursoId" class="form-label">Curso <span class="req" aria-hidden="true">*</span></label>
+                    <select id="cursoId" name="cursoId" class="form-select" required>
+                        <option th:each="c : ${cursos}" th:value="${c.id}" th:text="${c.nome}"
+                                th:selected="${c.id == disciplina.curso.id}">Curso</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="nome" class="form-label">Nome <span class="req" aria-hidden="true">*</span></label>
+                    <input id="nome" name="nome" class="form-control" required maxlength="150" th:value="${disciplina.nome}">
+                </div>
+                <div class="col-6 col-md-3">
+                    <label for="codigo" class="form-label">Código <span class="req" aria-hidden="true">*</span></label>
+                    <input id="codigo" name="codigo" class="form-control" required maxlength="30" th:value="${disciplina.codigo}">
+                </div>
+                <div class="col-6 col-md-3">
+                    <label for="carga" class="form-label">Carga horária <span class="req" aria-hidden="true">*</span></label>
+                    <input id="carga" name="cargaHoraria" type="number" min="1" class="form-control" required th:value="${disciplina.cargaHoraria}">
+                </div>
+                <div class="col-12 col-md-6">
+                    <span class="form-label d-block">Pré-requisitos</span>
+                    <div class="ec-checklist" role="group" aria-label="Pré-requisitos">
+                        <th:block th:each="d : ${disciplinas}">
+                            <div class="form-check" th:if="${d.id != disciplina.id}">
+                                <input class="form-check-input" type="checkbox" name="preRequisitos" th:value="${d.id}"
+                                       th:id="'pre' + ${d.id}" th:checked="${disciplina.preRequisitos.contains(d)}">
+                                <label class="form-check-label" th:for="'pre' + ${d.id}" th:text="${d.codigo} + ' – ' + ${d.nome}">Disc</label>
+                            </div>
+                        </th:block>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <label for="ementa" class="form-label">Ementa</label>
+                    <textarea id="ementa" name="ementa" class="form-control" rows="4" maxlength="2000"
+                              th:text="${disciplina.ementa}"></textarea>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <a th:href="@{/admin/cursos}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div></div>
+</main>
+<footer th:replace="~{fragments :: rodape}"></footer>
+<script th:replace="~{fragments :: scripts}"></script>
+<script th:replace="~{fragments :: app}"></script>
+</body>
+</html>

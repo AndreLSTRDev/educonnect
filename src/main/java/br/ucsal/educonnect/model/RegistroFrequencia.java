@@ -1,5 +1,6 @@
 package br.ucsal.educonnect.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,6 +24,10 @@ public class RegistroFrequencia {
 
     private boolean presente;
 
+    /** Pedido do cliente (validação do RF06): justificativa da falta, como um atestado. */
+    @Column(length = 200)
+    private String justificativa;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "turma_id")
     private Turma turma;
@@ -36,6 +41,8 @@ public class RegistroFrequencia {
     public void setDataRegistro(LocalDate dataRegistro) { this.dataRegistro = dataRegistro; }
     public boolean isPresente() { return presente; }
     public void setPresente(boolean presente) { this.presente = presente; }
+    public String getJustificativa() { return justificativa; }
+    public void setJustificativa(String justificativa) { this.justificativa = justificativa; }
     public Turma getTurma() { return turma; }
     public void setTurma(Turma turma) { this.turma = turma; }
     public Aluno getAluno() { return aluno; }

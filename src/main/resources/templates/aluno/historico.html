@@ -5,38 +5,56 @@
 <header th:replace="~{fragments :: nav}"></header>
 <main id="conteudo" class="container py-4">
     <div th:replace="~{fragments :: mensagens}"></div>
-    <h1 class="h3 mb-3">Histórico acadêmico</h1>
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        <h1 class="h3 mb-0 me-auto">Histórico acadêmico</h1>
+        <!-- Pedido do cliente (RF08): baixar ou imprimir o histórico -->
+        <button type="button" class="btn btn-outline-primary ec-nao-imprimir" onclick="window.print()"
+                th:unless="${linhas.isEmpty()}">
+            <i class="bi bi-printer" aria-hidden="true"></i> Imprimir ou salvar em PDF</button>
+    </div>
+    <div class="ec-so-impressao mb-3">
+        <strong th:text="${logado.nome}">Aluno</strong> · histórico emitido pelo EduConnect em
+        <span th:text="${#temporals.format(geradoEm, 'dd/MM/yyyy HH:mm')}">data</span>
+    </div>
     <p class="text-muted" th:if="${linhas.isEmpty()}">Nenhuma disciplina registrada no seu histórico.</p>
 
-    <div class="card mb-3" th:each="l : ${linhas}">
-        <div class="card-body">
-            <div class="d-flex flex-wrap justify-content-between gap-2">
-                <h2 class="h5 mb-0" th:text="${l.codigoDisciplina()} + ' – ' + ${l.nomeDisciplina()}">Disciplina</h2>
-                <span class="badge align-self-start" th:classappend="'text-bg-' + ${l.situacao().cor}" th:text="${l.situacao().rotulo}">Situação</span>
-            </div>
-            <p class="text-muted small mb-2" th:text="'Período ' + ${l.periodo()} + ' · ' + ${l.cargaHoraria()} + ' h'">Período</p>
-            <p class="mb-2">
-                Média: <strong th:text="${l.media() != null} ? ${#numbers.formatDecimal(l.media(), 1, 1, 'COMMA')} : 'sem notas'">–</strong>
-                · Frequência: <strong th:text="${l.frequencia() != null} ? ${#numbers.formatDecimal(l.frequencia(), 1, 1, 'COMMA')} + '%' : 'sem registros'">–</strong>
-            </p>
-            <th:block th:with="lista=${notas[l.turmaId()]}">
-                <div class="table-responsive" th:if="${lista != null and !lista.isEmpty()}">
-                    <table class="table table-sm mb-0">
-                        <thead><tr><th scope="col">Avaliação</th><th scope="col">Data</th><th scope="col">Nota</th><th scope="col">Observações</th></tr></thead>
-                        <tbody>
-                        <tr th:each="n : ${lista}">
-                            <td th:text="${n.avaliacao.nome}">Prova</td>
-                            <td th:text="${#temporals.format(n.avaliacao.dataAvaliacao, 'dd/MM/yyyy')}">01/01/2026</td>
-                            <td th:text="${#numbers.formatDecimal(n.valor, 1, 1, 'COMMA')} + ' / ' + ${#numbers.formatDecimal(n.avaliacao.valorMaximo, 1, 1, 'COMMA')}">8,0 / 10,0</td>
-                            <td th:text="${n.observacoes}">–</td>
-                        </tr>
-                        </tbody>
-                    </table>
+    <!-- Pedido do cliente (RF08): agrupado por período -->
+    <section class="mb-4" th:each="grupo : ${porPeriodo}" th:attr="aria-label='Período ' + ${grupo.key}">
+        <h2 class="h5 ec-periodo"><i class="bi bi-calendar3" aria-hidden="true"></i> Período <span th:text="${grupo.key}">2026.1</span>
+            <small class="text-muted fw-normal" th:text="'· ' + ${grupo.value.size()} + ' disciplina(s)'">· 1 disciplina</small></h2>
+        <div class="card mb-3" th:each="l : ${grupo.value}">
+            <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-between gap-2">
+                    <h3 class="h6 mb-0" th:text="${l.codigoDisciplina()} + ' – ' + ${l.nomeDisciplina()}">Disciplina</h3>
+                    <span class="badge align-self-start" th:classappend="'text-bg-' + ${l.situacao().cor}" th:text="${l.situacao().rotulo}">Situação</span>
                 </div>
-            </th:block>
+                <p class="text-muted small mb-2" th:text="${l.cargaHoraria()} + ' h'">60 h</p>
+                <p class="mb-2">
+                    Média: <strong th:text="${l.media() != null} ? ${#numbers.formatDecimal(l.media(), 1, 1, 'COMMA')} : 'sem notas'">–</strong>
+                    · Frequência: <strong th:text="${l.frequencia() != null} ? ${#numbers.formatDecimal(l.frequencia(), 1, 1, 'COMMA')} + '%' : 'sem registros'">–</strong>
+                    · Faltas: <strong th:text="${l.faltas()}">0</strong>
+                </p>
+                <th:block th:with="lista=${notas[l.turmaId()]}">
+                    <div class="table-responsive" th:if="${lista != null and !lista.isEmpty()}">
+                        <table class="table table-sm mb-0">
+                            <thead><tr><th scope="col">Avaliação</th><th scope="col">Data</th><th scope="col">Nota</th><th scope="col">Observações</th></tr></thead>
+                            <tbody>
+                            <tr th:each="n : ${lista}">
+                                <td th:text="${n.avaliacao.nome}">Prova</td>
+                                <td th:text="${#temporals.format(n.avaliacao.dataAvaliacao, 'dd/MM/yyyy')}">01/01/2026</td>
+                                <td th:text="${#numbers.formatDecimal(n.valor, 1, 1, 'COMMA')} + ' / ' + ${#numbers.formatDecimal(n.avaliacao.valorMaximo, 1, 1, 'COMMA')}">8,0 / 10,0</td>
+                                <td th:text="${n.observacoes} ?: '—'">–</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </th:block>
+            </div>
         </div>
-    </div>
+    </section>
 </main>
+
+<footer th:replace="~{fragments :: rodape}"></footer>
 <script th:replace="~{fragments :: scripts}"></script>
 <script th:replace="~{fragments :: app}"></script>
 </body>

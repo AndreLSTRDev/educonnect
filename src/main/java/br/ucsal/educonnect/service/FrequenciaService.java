@@ -27,6 +27,13 @@ public class FrequenciaService {
     /** Registra presença (ids marcados) e ausência (demais alunos da turma) para a data. */
     @Transactional
     public void registrar(Long professorId, Long turmaId, LocalDate data, Collection<Long> presentes) {
+        registrar(professorId, turmaId, data, presentes, Map.of());
+    }
+
+    /** Sobrecarga com justificativa por aluno ausente (pedido do cliente na validação do RF06). */
+    @Transactional
+    public void registrar(Long professorId, Long turmaId, LocalDate data, Collection<Long> presentes,
+                          Map<Long, String> justificativas) {
         Turma turma = cadastro.turmaDoProfessor(professorId, turmaId);
         if (data == null) {
             throw new RegraNegocioException("Informe a data da aula.");
@@ -44,7 +51,11 @@ public class FrequenciaService {
             r.setTurma(turma);
             r.setAluno(aluno);
             r.setDataRegistro(data);
-            r.setPresente(presentes != null && presentes.contains(aluno.getId()));
+            boolean presente = presentes != null && presentes.contains(aluno.getId());
+            String just = presente || justificativas == null ? null : Validacao.opcional(justificativas.get(aluno.getId()));
+            Validacao.limitar(just, "Justificativa", 200);
+            r.setPresente(presente);
+            r.setJustificativa(just);
             repository.save(r);
         }
     }
@@ -55,6 +66,26 @@ public class FrequenciaService {
         repository.findByTurmaIdAndDataRegistro(turmaId, data)
                 .forEach(r -> mapa.put(r.getAluno().getId(), r.isPresente()));
         return mapa;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, String> justificativasDoDia(Long turmaId, LocalDate data) {
+        Map<Long, String> mapa = new HashMap<>();
+        repository.findByTurmaIdAndDataRegistro(turmaId, data).stream()
+                .filter(r -> r.getJustificativa() != null)
+                .forEach(r -> mapa.put(r.getAluno().getId(), r.getJustificativa()));
+        return mapa;
+    }
+
+    /** Pedido do cliente (validação do RF07): quantidade de faltas do aluno na turma. */
+    @Transactional(readOnly = true)
+    public long faltas(Long turmaId, Long alunoId) {
+        return repository.countByTurmaIdAndAlunoIdAndPresenteFalse(turmaId, alunoId);
+    }
+
+    @Transactional(readOnly = true)
+    public long faltasJustificadas(Long turmaId, Long alunoId) {
+        return repository.countByTurmaIdAndAlunoIdAndPresenteFalseAndJustificativaIsNotNull(turmaId, alunoId);
     }
 
     /** Percentual de presença do aluno na turma (nulo se ainda não há registros). */

@@ -12,14 +12,14 @@
         <p class="text-muted small"><span class="req" aria-hidden="true">*</span> campo obrigatório</p>
         <form method="post" th:action="@{/admin/turmas}">
             <div class="row g-3">
-                <div class="col-12 col-md-4">
+                <div class="col-12 col-md-3">
                     <label for="disciplinaId" class="form-label">Disciplina <span class="req" aria-hidden="true">*</span></label>
                     <select id="disciplinaId" name="disciplinaId" class="form-select" required>
                         <option value="">Selecione...</option>
                         <option th:each="d : ${disciplinas}" th:value="${d.id}" th:text="${d.codigo} + ' – ' + ${d.nome}">Disc</option>
                     </select>
                 </div>
-                <div class="col-12 col-md-4">
+                <div class="col-12 col-md-3">
                     <label for="professorId" class="form-label">Professor responsável <span class="req" aria-hidden="true">*</span></label>
                     <select id="professorId" name="professorId" class="form-select" required>
                         <option value="">Selecione...</option>
@@ -29,6 +29,10 @@
                 <div class="col-6 col-md-2">
                     <label for="codigo" class="form-label">Código <span class="req" aria-hidden="true">*</span></label>
                     <input id="codigo" name="codigo" class="form-control" required maxlength="30" placeholder="T01">
+                </div>
+                <div class="col-6 col-md-2">
+                    <label for="sala" class="form-label">Sala</label>
+                    <input id="sala" name="sala" class="form-control" maxlength="60" placeholder="B-204">
                 </div>
                 <div class="col-6 col-md-2">
                     <label for="periodo" class="form-label">Período <span class="req" aria-hidden="true">*</span></label>
@@ -44,24 +48,29 @@
             <table class="table table-hover mb-0">
                 <caption class="visually-hidden">Turmas cadastradas</caption>
                 <thead><tr><th scope="col">Período</th><th scope="col">Turma</th><th scope="col">Disciplina</th>
-                    <th scope="col">Professor</th><th scope="col">Alunos</th><th scope="col">Situação</th><th scope="col"></th></tr></thead>
+                    <th scope="col">Professores</th><th scope="col">Sala</th><th scope="col">Alunos</th><th scope="col">Situação</th><th scope="col"></th></tr></thead>
                 <tbody>
                 <tr th:each="t : ${turmas}">
                     <td th:text="${t.periodo}">2026.1</td>
                     <td th:text="${t.codigo}">T01</td>
                     <td th:text="${t.disciplina.nome}">Disc</td>
-                    <td th:text="${t.professor.nomeCompleto}">Prof</td>
+                    <td>
+                        <span th:text="${t.professor.nomeCompleto}">Prof</span>
+                        <div class="small text-muted" th:each="p : ${t.professoresAdicionais}" th:text="${p.nomeCompleto}">Prof 2</div>
+                    </td>
+                    <td th:text="${t.sala} ?: '—'">Sala</td>
                     <td th:text="${t.alunos.size()}">0</td>
                     <td><span class="badge" th:classappend="${t.encerrada} ? 'text-bg-secondary' : 'text-bg-success'"
                               th:text="${t.encerrada} ? 'Encerrada' : 'Em andamento'">Status</span></td>
                     <td><a class="btn btn-sm btn-outline-primary" th:href="@{/admin/turmas/{id}(id=${t.id})}">Gerenciar</a></td>
                 </tr>
-                <tr th:if="${turmas.isEmpty()}"><td colspan="7" class="text-muted">Nenhuma turma cadastrada.</td></tr>
+                <tr th:if="${turmas.isEmpty()}"><td colspan="8" class="text-muted">Nenhuma turma cadastrada.</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 </main>
+<footer th:replace="~{fragments :: rodape}"></footer>
 <script th:replace="~{fragments :: scripts}"></script>
 <script th:replace="~{fragments :: app}"></script>
 </body>

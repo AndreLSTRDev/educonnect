@@ -7,13 +7,15 @@
     <div th:replace="~{fragments :: mensagens}"></div>
     <a th:href="@{/admin/turmas}" class="small">&larr; Voltar às turmas</a>
     <h1 class="h3 my-3" th:text="${turma.disciplina.nome} + ' – turma ' + ${turma.codigo} + ' (' + ${turma.periodo} + ')'">Turma</h1>
-    <p>
+    <p class="d-flex flex-wrap gap-2 align-items-center">
         <span class="badge" th:classappend="${turma.encerrada} ? 'text-bg-secondary' : 'text-bg-success'"
               th:text="${turma.encerrada} ? 'Encerrada' : 'Em andamento'">Status</span>
+        <span class="small text-muted"><i class="bi bi-door-open" aria-hidden="true"></i>
+            Sala: <strong th:text="${turma.sala} ?: 'não informada'">B-204</strong></span>
     </p>
 
     <div class="row g-3 mb-4">
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-lg-4">
             <div class="card h-100"><div class="card-body">
                 <h2 class="h5">Professor responsável</h2>
                 <form method="post" th:action="@{/admin/turmas/{id}/professor(id=${turma.id})}">
@@ -22,11 +24,34 @@
                         <option th:each="p : ${professores}" th:value="${p.id}" th:text="${p.nomeCompleto}"
                                 th:selected="${p.id == turma.professor.id}">Prof</option>
                     </select>
-                    <button type="submit" class="btn btn-outline-primary">Vincular professor</button>
+                    <button type="submit" class="btn btn-outline-primary">Definir responsável</button>
                 </form>
             </div></div>
         </div>
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-lg-4">
+            <div class="card h-100"><div class="card-body">
+                <h2 class="h5">Outros professores</h2>
+                <ul class="list-unstyled mb-3" th:unless="${turma.professoresAdicionais.isEmpty()}">
+                    <li class="d-flex align-items-center gap-2 mb-1" th:each="p : ${turma.professoresAdicionais}">
+                        <span class="me-auto" th:text="${p.nomeCompleto}">Prof</span>
+                        <form method="post" th:action="@{/admin/turmas/{id}/professores/{pid}/remover(id=${turma.id},pid=${p.id})}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    th:attr="aria-label='Remover ' + ${p.nomeCompleto}">Remover</button>
+                        </form>
+                    </li>
+                </ul>
+                <p class="text-muted small" th:if="${turma.professoresAdicionais.isEmpty()}">Só o professor responsável leciona nesta turma.</p>
+                <form method="post" th:action="@{/admin/turmas/{id}/professores(id=${turma.id})}">
+                    <label for="professorAdicional" class="form-label">Adicionar professor</label>
+                    <select id="professorAdicional" name="professorId" class="form-select mb-3" required>
+                        <option value="">Selecione...</option>
+                        <option th:each="p : ${professores}" th:value="${p.id}" th:text="${p.nomeCompleto}">Prof</option>
+                    </select>
+                    <button type="submit" class="btn btn-outline-primary">Adicionar</button>
+                </form>
+            </div></div>
+        </div>
+        <div class="col-12 col-lg-4">
             <div class="card h-100"><div class="card-body">
                 <h2 class="h5">Vincular aluno</h2>
                 <form method="post" th:action="@{/admin/turmas/{id}/alunos(id=${turma.id})}">
@@ -38,6 +63,14 @@
                     </select>
                     <button type="submit" class="btn btn-primary" th:disabled="${turma.encerrada}">Vincular aluno</button>
                 </form>
+                <hr>
+                <form method="post" th:action="@{/admin/turmas/{id}/sala(id=${turma.id})}">
+                    <label for="sala" class="form-label">Sala</label>
+                    <div class="d-flex gap-2">
+                        <input id="sala" name="sala" class="form-control" maxlength="60" th:value="${turma.sala}" placeholder="B-204">
+                        <button type="submit" class="btn btn-outline-primary">Salvar</button>
+                    </div>
+                </form>
             </div></div>
         </div>
     </div>
@@ -46,17 +79,25 @@
         <div class="card-body">
             <h2 class="h5">Alunos da turma (<span th:text="${turma.alunos.size()}">0</span>)</h2>
             <p class="text-muted mb-0" th:if="${turma.alunos.isEmpty()}">Nenhum aluno vinculado.</p>
-            <ul class="mb-0" th:unless="${turma.alunos.isEmpty()}">
-                <li th:each="a : ${turma.alunos}" th:text="${a.nomeCompleto} + ' – ' + ${a.matricula}">Aluno</li>
+            <ul class="list-unstyled mb-0" th:unless="${turma.alunos.isEmpty()}">
+                <li class="d-flex align-items-center gap-2 py-1 border-bottom" th:each="a : ${turma.alunos}">
+                    <span class="me-auto" th:text="${a.nomeCompleto} + ' – ' + ${a.matricula}">Aluno</span>
+                    <form method="post" th:unless="${turma.encerrada}"
+                          th:action="@{/admin/turmas/{id}/alunos/{aid}/remover(id=${turma.id},aid=${a.id})}"
+                          th:attr="data-confirmar='Remover ' + ${a.nomeCompleto} + ' da turma?'">
+                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                th:attr="aria-label='Remover ' + ${a.nomeCompleto}">Remover</button>
+                    </form>
+                </li>
             </ul>
+            <p class="form-text mb-0 mt-2">Só é possível remover alunos que ainda não têm notas nem frequência na turma.</p>
         </div>
     </div>
-
-    <form method="post" th:action="@{/admin/turmas/{id}/encerrar(id=${turma.id})}" th:unless="${turma.encerrada}">
-        <button type="submit" class="btn btn-outline-danger">Encerrar turma</button>
-        <span class="form-text ms-2">Após encerrar, aprovação/reprovação passam a ser exibidas aos alunos.</span>
-    </form>
+    <p class="text-muted small"><i class="bi bi-info-circle" aria-hidden="true"></i>
+        O encerramento da turma (que define aprovado/reprovado) é feito pelo professor, na página da turma.</p>
 </main>
+
+<footer th:replace="~{fragments :: rodape}"></footer>
 <script th:replace="~{fragments :: scripts}"></script>
 <script th:replace="~{fragments :: app}"></script>
 </body>

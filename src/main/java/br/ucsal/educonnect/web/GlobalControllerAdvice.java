@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,6 +22,30 @@ public class GlobalControllerAdvice {
     @ModelAttribute("logado")
     public UsuarioLogado logado(@AuthenticationPrincipal UsuarioLogado usuario) {
         return usuario;
+    }
+
+    /** Identidade visual (nome, slogan e logo), configurável em application.properties. */
+    @ModelAttribute("marca")
+    public Marca marca(@Value("${educonnect.marca.nome:EduConnect}") String nome,
+                       @Value("${educonnect.marca.slogan:Gestão acadêmica conectada}") String slogan,
+                       @Value("${educonnect.marca.logo:}") String logo) {
+        return new Marca(nome, slogan, logo);
+    }
+
+    /** Caminho da página atual, usado para destacar o item ativo do menu. */
+    @ModelAttribute("caminhoAtual")
+    public String caminhoAtual(HttpServletRequest request) {
+        return request.getRequestURI().substring(request.getContextPath().length());
+    }
+
+    public record Marca(String nome, String slogan, String logo) { }
+
+    /** Anexo maior que o limite configurado (spring.servlet.multipart.*). */
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public String arquivoGrande(HttpServletRequest request) {
+        RequestContextUtils.getOutputFlashMap(request).put("erro",
+                "Os arquivos enviados passam do limite (5 MB por arquivo, 16 MB no total). Reduza e tente de novo.");
+        return "redirect:" + destinoDeRetorno(request);
     }
 
     /**

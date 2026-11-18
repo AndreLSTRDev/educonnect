@@ -9,7 +9,7 @@
     <p class="text-muted small"><span class="req" aria-hidden="true">*</span> campo obrigatório</p>
 
     <div class="row g-3 mb-4">
-        <div class="col-12 col-lg-5">
+        <div class="col-12 col-lg-4">
             <div class="card h-100"><div class="card-body">
                 <h2 class="h5">Novo curso</h2>
                 <form method="post" th:action="@{/admin/cursos}">
@@ -19,12 +19,12 @@
                 </form>
             </div></div>
         </div>
-        <div class="col-12 col-lg-7">
+        <div class="col-12 col-lg-8">
             <div class="card h-100"><div class="card-body">
                 <h2 class="h5">Nova disciplina</h2>
                 <form method="post" th:action="@{/admin/disciplinas}">
                     <div class="row g-2">
-                        <div class="col-12">
+                        <div class="col-12 col-md-6">
                             <label for="cursoId" class="form-label">Curso <span class="req" aria-hidden="true">*</span></label>
                             <select id="cursoId" name="cursoId" class="form-select" required>
                                 <option value="">Selecione...</option>
@@ -43,6 +43,21 @@
                             <label for="carga" class="form-label">Carga horária <span class="req" aria-hidden="true">*</span></label>
                             <input id="carga" name="cargaHoraria" type="number" min="1" class="form-control" required>
                         </div>
+                        <div class="col-12 col-md-6">
+                            <span class="form-label d-block">Pré-requisitos</span>
+                            <div class="ec-checklist" role="group" aria-label="Pré-requisitos da nova disciplina">
+                                <p class="text-muted small mb-0" th:if="${disciplinas.isEmpty()}">Nenhuma disciplina cadastrada.</p>
+                                <div class="form-check" th:each="d : ${disciplinas}">
+                                    <input class="form-check-input" type="checkbox" name="preRequisitos" th:value="${d.id}" th:id="'pre' + ${d.id}">
+                                    <label class="form-check-label" th:for="'pre' + ${d.id}" th:text="${d.codigo} + ' – ' + ${d.nome}">Disc</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label for="ementa" class="form-label">Ementa</label>
+                            <textarea id="ementa" name="ementa" class="form-control" rows="2" maxlength="2000"
+                                      placeholder="Conteúdos abordados na disciplina"></textarea>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary mt-3">Cadastrar disciplina</button>
                 </form>
@@ -52,16 +67,47 @@
 
     <div class="card mb-3" th:each="c : ${cursos}">
         <div class="card-body">
-            <h2 class="h5" th:text="${c.nome}">Curso</h2>
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                <h2 class="h5 mb-0 me-auto" th:text="${c.nome}">Curso</h2>
+                <details class="ec-inline">
+                    <summary class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil" aria-hidden="true"></i> Renomear</summary>
+                    <form method="post" th:action="@{/admin/cursos/{id}(id=${c.id})}" class="d-flex gap-2 mt-2">
+                        <label class="visually-hidden" th:for="'nomeCurso' + ${c.id}">Novo nome do curso</label>
+                        <input th:id="'nomeCurso' + ${c.id}" name="nome" class="form-control form-control-sm" required maxlength="150" th:value="${c.nome}">
+                        <button type="submit" class="btn btn-sm btn-primary">Salvar</button>
+                    </form>
+                </details>
+                <form method="post" th:action="@{/admin/cursos/{id}/excluir(id=${c.id})}"
+                      th:attr="data-confirmar='Excluir o curso ' + ${c.nome} + '?'">
+                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash" aria-hidden="true"></i> Excluir</button>
+                </form>
+            </div>
             <p class="text-muted mb-2" th:if="${c.disciplinas.isEmpty()}">Nenhuma disciplina cadastrada.</p>
             <div class="table-responsive" th:unless="${c.disciplinas.isEmpty()}">
                 <table class="table table-sm mb-0">
-                    <thead><tr><th scope="col">Código</th><th scope="col">Disciplina</th><th scope="col">Carga horária</th></tr></thead>
+                    <thead><tr><th scope="col">Código</th><th scope="col">Disciplina</th><th scope="col">Carga horária</th>
+                        <th scope="col">Pré-requisitos</th><th scope="col">Ações</th></tr></thead>
                     <tbody>
                     <tr th:each="d : ${c.disciplinas}">
                         <td th:text="${d.codigo}">COD</td>
-                        <td th:text="${d.nome}">Nome</td>
+                        <td>
+                            <span th:text="${d.nome}">Nome</span>
+                            <div class="small text-muted ec-ementa" th:if="${d.ementa}" th:text="${d.ementa}">Ementa</div>
+                        </td>
                         <td th:text="${d.cargaHoraria} + ' h'">60 h</td>
+                        <td>
+                            <span class="text-muted" th:if="${d.preRequisitos.isEmpty()}">—</span>
+                            <span class="badge text-bg-secondary me-1" th:each="p : ${d.preRequisitos}" th:text="${p.codigo}">COD</span>
+                        </td>
+                        <td class="text-nowrap">
+                            <a class="btn btn-sm btn-outline-primary" th:href="@{/admin/disciplinas/{id}/editar(id=${d.id})}"
+                               th:attr="aria-label='Editar ' + ${d.nome}">Editar</a>
+                            <form class="d-inline" method="post" th:action="@{/admin/disciplinas/{id}/excluir(id=${d.id})}"
+                                  th:attr="data-confirmar='Excluir a disciplina ' + ${d.codigo} + '?'">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        th:attr="aria-label='Excluir ' + ${d.nome}">Excluir</button>
+                            </form>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -70,6 +116,8 @@
     </div>
     <p class="text-muted" th:if="${cursos.isEmpty()}">Nenhum curso cadastrado ainda.</p>
 </main>
+
+<footer th:replace="~{fragments :: rodape}"></footer>
 <script th:replace="~{fragments :: scripts}"></script>
 <script th:replace="~{fragments :: app}"></script>
 </body>

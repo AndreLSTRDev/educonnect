@@ -5,17 +5,50 @@
 <header th:replace="~{fragments :: nav}"></header>
 <main id="conteudo" class="container py-4">
     <div th:replace="~{fragments :: mensagens}"></div>
-    <h1 class="h3 mb-3">Gerenciar denúncias</h1>
+    <div class="ec-boas-vindas">
+        <h1>Gerenciar denúncias</h1>
+        <p>Analise as denúncias registradas, atualize o status e mantenha o histórico de cada caso.</p>
+    </div>
 
-    <form method="get" class="row g-2 align-items-end mb-3" th:action="@{/gestor}">
-        <div class="col-auto">
-            <label for="status" class="form-label">Filtrar por status</label>
-            <select id="status" name="status" class="form-select">
-                <option value="">Todos</option>
-                <option th:each="s : ${todosStatus}" th:value="${s}" th:text="${s.rotulo}" th:selected="${s == statusFiltro}">S</option>
-            </select>
+    <!-- Pedido do cliente (RF10): filtros por status, categoria, período, aluno e protocolo -->
+    <form method="get" class="card mb-3" th:action="@{/gestor}" role="search" aria-label="Filtrar denúncias">
+        <div class="card-body row g-2 align-items-end">
+            <div class="col-6 col-md-2">
+                <label for="status" class="form-label">Status</label>
+                <select id="status" name="status" class="form-select">
+                    <option value="">Todos</option>
+                    <option th:each="s : ${todosStatus}" th:value="${s}" th:text="${s.rotulo}" th:selected="${s == filtro.status()}">S</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label for="categoria" class="form-label">Categoria</label>
+                <select id="categoria" name="categoria" class="form-select">
+                    <option value="">Todas</option>
+                    <option th:each="c : ${categorias}" th:value="${c}" th:text="${c.rotulo}" th:selected="${c == filtro.categoria()}">C</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label for="de" class="form-label">Aberta de</label>
+                <input id="de" name="de" type="date" class="form-control" th:value="${filtro.de()}">
+            </div>
+            <div class="col-6 col-md-2">
+                <label for="ate" class="form-label">até</label>
+                <input id="ate" name="ate" type="date" class="form-control" th:value="${filtro.ate()}">
+            </div>
+            <div class="col-6 col-md-2">
+                <label for="aluno" class="form-label">Aluno</label>
+                <input id="aluno" name="aluno" class="form-control" th:value="${filtro.aluno()}" placeholder="Nome">
+            </div>
+            <div class="col-6 col-md-2">
+                <label for="protocolo" class="form-label">Protocolo</label>
+                <input id="protocolo" name="protocolo" class="form-control" th:value="${filtro.protocolo()}" placeholder="EDU-2026-...">
+            </div>
+            <div class="col-12 d-flex gap-2 align-items-center">
+                <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-funnel me-1" aria-hidden="true"></i>Filtrar</button>
+                <a class="btn btn-link" th:href="@{/gestor}" th:if="${filtrando}">Limpar filtros</a>
+                <span class="ms-auto small text-muted" th:text="${denuncias.size()} + ' denúncia(s)'">0 denúncias</span>
+            </div>
         </div>
-        <div class="col-auto"><button type="submit" class="btn btn-outline-secondary">Filtrar</button></div>
     </form>
 
     <div class="card">
@@ -29,7 +62,11 @@
                     <td th:text="${d.protocolo}">EDU</td>
                     <td th:text="${d.titulo}">Título</td>
                     <td th:text="${d.categoria.rotulo}">Cat</td>
-                    <td th:text="${d.aluno.nomeCompleto}">Aluno</td>
+                    <td>
+                        <span th:text="${d.autorExibido}" th:classappend="${d.anonima} ? 'text-muted fst-italic'">Aluno</span>
+                        <i class="bi bi-paperclip text-muted ms-1" th:unless="${d.anexos.isEmpty()}"
+                           th:attr="aria-label=${d.anexos.size()} + ' anexo(s)',title=${d.anexos.size()} + ' anexo(s)'"></i>
+                    </td>
                     <td th:text="${#temporals.format(d.dataAbertura, 'dd/MM/yyyy HH:mm')}">data</td>
                     <td><span class="badge" th:classappend="'text-bg-' + ${d.status.cor}" th:text="${d.status.rotulo}">Status</span></td>
                     <td><a class="btn btn-sm btn-primary" th:href="@{/gestor/denuncias/{id}(id=${d.id})}">Analisar</a></td>
@@ -40,6 +77,7 @@
         </div>
     </div>
 </main>
+<footer th:replace="~{fragments :: rodape}"></footer>
 <script th:replace="~{fragments :: scripts}"></script>
 <script th:replace="~{fragments :: app}"></script>
 </body>

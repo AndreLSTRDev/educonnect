@@ -98,17 +98,32 @@ public class ProfessorController {
         model.addAttribute("data", dia);
         model.addAttribute("hoje", LocalDate.now());
         model.addAttribute("presencas", frequencia.presencasDoDia(id, dia));
+        model.addAttribute("justificativas", frequencia.justificativasDoDia(id, dia));
         return "professor/frequencia";
     }
 
     @PostMapping("/turmas/{id}/frequencia")
     public String salvarFrequencia(@PathVariable Long id, @RequestParam String data,
                                    @RequestParam(required = false) List<Long> presentes,
+                                   @RequestParam Map<String, String> params,
                                    @AuthenticationPrincipal UsuarioLogado logado, RedirectAttributes ra) {
         LocalDate dia = parseData(data);
-        frequencia.registrar(logado.getId(), id, dia, presentes);
+        Turma turma = cadastro.turmaDoProfessor(logado.getId(), id);
+        // Pedido do cliente (validação do RF06): justificativa de falta por aluno (campo just_<id>).
+        Map<Long, String> justificativas = new HashMap<>();
+        turma.getAlunos().forEach(a -> justificativas.put(a.getId(), params.get("just_" + a.getId())));
+        frequencia.registrar(logado.getId(), id, dia, presentes, justificativas);
         ra.addFlashAttribute("sucesso", "Frequência registrada.");
         return "redirect:/professor/turmas/" + id + "/frequencia?data=" + dia;
+    }
+
+    /** Pedido do cliente (validação do RF04): o professor da turma é quem encerra a turma. */
+    @PostMapping("/turmas/{id}/encerrar")
+    public String encerrar(@PathVariable Long id, @AuthenticationPrincipal UsuarioLogado logado,
+                           RedirectAttributes ra) {
+        cadastro.encerrarTurma(logado.getId(), id);
+        ra.addFlashAttribute("sucesso", "Turma encerrada. Os resultados finais já são exibidos aos alunos.");
+        return "redirect:/professor/turmas/" + id;
     }
 
     private LocalDate parseData(String data) {

@@ -23,26 +23,74 @@
         <div class="table-responsive">
             <table class="table mb-0">
                 <caption class="visually-hidden">Desempenho por disciplina no período selecionado</caption>
-                <thead><tr><th scope="col">Disciplina</th><th scope="col">Média</th><th scope="col">Frequência</th><th scope="col">Situação</th></tr></thead>
+                <thead><tr><th scope="col">Disciplina</th><th scope="col">Média</th><th scope="col">Frequência</th>
+                    <th scope="col">Faltas</th><th scope="col">Situação</th></tr></thead>
                 <tbody>
                 <tr th:each="l : ${linhas}">
                     <td><span th:text="${l.nomeDisciplina()}">Disciplina</span>
                         <small class="text-muted d-block" th:text="${l.codigoDisciplina()} + ' · ' + ${l.cargaHoraria()} + ' h'">COD</small></td>
                     <td th:text="${l.media() != null} ? ${#numbers.formatDecimal(l.media(), 1, 1, 'COMMA')} : 'Sem notas'">–</td>
                     <td th:text="${l.frequencia() != null} ? ${#numbers.formatDecimal(l.frequencia(), 1, 1, 'COMMA')} + '%' : 'Sem registros'">–</td>
+                    <td>
+                        <span th:text="${l.faltas()}">0</span>
+                        <small class="text-muted d-block" th:if="${l.faltasJustificadas() > 0}"
+                               th:text="${l.faltasJustificadas()} + ' justificada(s)'">1 justificada</small>
+                    </td>
                     <td><span class="badge" th:classappend="'text-bg-' + ${l.situacao().cor}" th:text="${l.situacao().rotulo}">Situação</span></td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <p class="mt-3" th:if="${mediaGeral != null}">
+    <p class="mt-3 mb-1" th:if="${mediaGeral != null}">
         Média geral do período:
         <strong th:text="${#numbers.formatDecimal(mediaGeral, 1, 1, 'COMMA')}">0,0</strong>
     </p>
-    <p class="form-text">A situação final (aprovado/reprovado) só é definida quando a turma é encerrada.</p>
+    <p class="form-text">Enquanto a turma está aberta, o sistema avisa quando você está <strong>em risco</strong>
+        (média abaixo de 6,0 ou frequência abaixo de 75%). A situação final (aprovado/reprovado) é definida quando o professor encerra a turma.</p>
+
+    <!-- Pedido do cliente (RF07): gráfico de evolução das notas -->
+    <section class="card mt-4" th:unless="${evolucao.isEmpty()}" aria-labelledby="tituloEvolucao">
+        <div class="card-body">
+            <h2 class="h5" id="tituloEvolucao">Evolução das notas</h2>
+            <p class="text-muted small mb-3">Nota de cada avaliação convertida para a escala de 0 a 10. A linha tracejada marca a média mínima (6,0).</p>
+            <div class="ec-grafico"><canvas id="graficoEvolucao" role="img"
+                    aria-label="Gráfico de linhas com a nota de cada avaliação por disciplina. Os mesmos valores estão na lista de notas abaixo."></canvas></div>
+        </div>
+    </section>
+
+    <!-- Pedido do cliente (RF07): nota de cada avaliação -->
+    <section class="mt-4" th:unless="${linhas.isEmpty()}" aria-labelledby="tituloNotas">
+        <h2 class="h5" id="tituloNotas">Notas por avaliação</h2>
+        <div class="card mb-2" th:each="l : ${linhas}">
+            <details class="card-body py-2" th:with="lista=${notas[l.turmaId()]}" open>
+                <summary class="fw-semibold" th:text="${l.nomeDisciplina()}">Disciplina</summary>
+                <p class="text-muted small my-2" th:if="${lista == null or lista.isEmpty()}">Nenhuma nota lançada ainda.</p>
+                <div class="table-responsive" th:if="${lista != null and !lista.isEmpty()}">
+                    <table class="table table-sm mb-1">
+                        <thead><tr><th scope="col">Avaliação</th><th scope="col">Data</th><th scope="col">Nota</th><th scope="col">Observações</th></tr></thead>
+                        <tbody>
+                        <tr th:each="n : ${lista}">
+                            <td th:text="${n.avaliacao.nome}">Prova</td>
+                            <td th:text="${#temporals.format(n.avaliacao.dataAvaliacao, 'dd/MM/yyyy')}">01/01/2026</td>
+                            <td th:text="${#numbers.formatDecimal(n.valor, 1, 1, 'COMMA')} + ' / ' + ${#numbers.formatDecimal(n.avaliacao.valorMaximo, 1, 1, 'COMMA')}">8,0 / 10,0</td>
+                            <td th:text="${n.observacoes} ?: '—'">–</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        </div>
+    </section>
 </main>
+
+<footer th:replace="~{fragments :: rodape}"></footer>
 <script th:replace="~{fragments :: scripts}"></script>
 <script th:replace="~{fragments :: app}"></script>
+<script th:unless="${evolucao.isEmpty()}" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script th:unless="${evolucao.isEmpty()}" th:inline="javascript">
+    window.EC_EVOLUCAO = /*[[${evolucao}]]*/ [];
+</script>
+<script th:unless="${evolucao.isEmpty()}" th:src="@{/js/grafico-evolucao.js}"></script>
 </body>
 </html>

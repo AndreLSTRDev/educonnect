@@ -13,9 +13,17 @@
         </div>
         <p class="text-muted mb-2">Protocolo <strong th:text="${denuncia.protocolo}">EDU</strong>
             · <span th:text="${denuncia.categoria.rotulo}">Cat</span>
-            · aluno: <span th:text="${denuncia.aluno.nomeCompleto}">Aluno</span>
+            · aluno: <span th:text="${denuncia.autorExibido}">Aluno</span>
             · <span th:text="${#temporals.format(denuncia.dataAbertura, 'dd/MM/yyyy HH:mm')}">data</span></p>
         <p style="white-space: pre-wrap" th:text="${denuncia.descricao}">Descrição</p>
+        <div th:unless="${denuncia.anexos.isEmpty()}">
+            <h2 class="h6">Anexos</h2>
+            <ul class="list-unstyled mb-0">
+                <li th:each="a : ${denuncia.anexos}"><i class="bi bi-paperclip" aria-hidden="true"></i>
+                    <a th:href="@{/gestor/anexos/{id}(id=${a.id})}" th:text="${a.nomeArquivo}">arquivo.pdf</a>
+                    <span class="text-muted small" th:text="'(' + ${a.tamanhoFormatado} + ')'">(10 KB)</span></li>
+            </ul>
+        </div>
     </div></div>
 
     <div class="row g-3">
@@ -28,8 +36,10 @@
                         <option value="">Selecione...</option>
                         <option th:each="s : ${todosStatus}" th:value="${s}" th:text="${s.rotulo}">S</option>
                     </select>
-                    <label for="comentario" class="form-label">Comentário (visível ao aluno)</label>
-                    <textarea id="comentario" name="comentario" class="form-control mb-3" rows="3" maxlength="500"></textarea>
+                    <label for="comentario" class="form-label">Comentário (visível ao aluno) <span class="req" aria-hidden="true">*</span></label>
+                    <textarea id="comentario" name="comentario" class="form-control" rows="3" maxlength="500" required
+                              aria-describedby="ajudaComentario"></textarea>
+                    <div id="ajudaComentario" class="form-text mb-3">O aluno recebe um aviso por e-mail com o novo status e este comentário.</div>
                     <button type="submit" class="btn btn-primary">Salvar alteração</button>
                 </form>
             </div></div>
@@ -49,6 +59,7 @@
         </div>
     </div>
 </main>
+<footer th:replace="~{fragments :: rodape}"></footer>
 <script th:replace="~{fragments :: scripts}"></script>
 <script th:replace="~{fragments :: app}"></script>
 </body>

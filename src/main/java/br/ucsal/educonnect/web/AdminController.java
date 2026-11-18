@@ -4,6 +4,7 @@ import br.ucsal.educonnect.model.Perfil;
 import br.ucsal.educonnect.security.UsuarioLogado;
 import br.ucsal.educonnect.service.CadastroService;
 import br.ucsal.educonnect.service.UsuarioService;
+import java.util.List;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,9 +39,14 @@ public class AdminController {
 
     // ---------- Usuários (RF02) ----------
 
+    /** Pedido do cliente (validação do RF02): busca e filtro por perfil. */
     @GetMapping("/usuarios")
-    public String listarUsuarios(Model model) {
-        model.addAttribute("usuarios", usuarios.listar());
+    public String listarUsuarios(@RequestParam(required = false) String busca,
+                                 @RequestParam(required = false) Perfil perfil, Model model) {
+        model.addAttribute("usuarios", usuarios.listar(busca, perfil));
+        model.addAttribute("busca", busca);
+        model.addAttribute("perfilFiltro", perfil);
+        model.addAttribute("perfis", Perfil.values());
         return "admin/usuarios";
     }
 
@@ -98,6 +104,7 @@ public class AdminController {
     @GetMapping("/cursos")
     public String cursos(Model model) {
         model.addAttribute("cursos", cadastro.listarCursos());
+        model.addAttribute("disciplinas", cadastro.listarDisciplinas());
         return "admin/cursos";
     }
 
@@ -108,12 +115,57 @@ public class AdminController {
         return "redirect:/admin/cursos";
     }
 
+    /** Pedido do cliente (validação do RF03): editar e excluir cursos. */
+    @PostMapping("/cursos/{id}")
+    public String renomearCurso(@PathVariable Long id, @RequestParam String nome, RedirectAttributes ra) {
+        cadastro.renomearCurso(id, nome);
+        ra.addFlashAttribute("sucesso", "Curso renomeado.");
+        return "redirect:/admin/cursos";
+    }
+
+    @PostMapping("/cursos/{id}/excluir")
+    public String excluirCurso(@PathVariable Long id, RedirectAttributes ra) {
+        cadastro.excluirCurso(id);
+        ra.addFlashAttribute("sucesso", "Curso excluído.");
+        return "redirect:/admin/cursos";
+    }
+
     @PostMapping("/disciplinas")
     public String criarDisciplina(@RequestParam(required = false) Long cursoId, @RequestParam String nome,
                                   @RequestParam String codigo, @RequestParam String cargaHoraria,
+                                  @RequestParam(required = false) String ementa,
+                                  @RequestParam(required = false) List<Long> preRequisitos,
                                   RedirectAttributes ra) {
-        cadastro.criarDisciplina(cursoId, nome, codigo, cargaHoraria);
+        cadastro.criarDisciplina(cursoId, nome, codigo, cargaHoraria, ementa, preRequisitos);
         ra.addFlashAttribute("sucesso", "Disciplina cadastrada com sucesso.");
+        return "redirect:/admin/cursos";
+    }
+
+    /** Pedido do cliente (validação do RF03): editar e excluir disciplinas. */
+    @GetMapping("/disciplinas/{id}/editar")
+    public String editarDisciplina(@PathVariable Long id, Model model) {
+        model.addAttribute("disciplina", cadastro.buscarDisciplina(id));
+        model.addAttribute("cursos", cadastro.listarCursos());
+        model.addAttribute("disciplinas", cadastro.listarDisciplinas());
+        return "admin/disciplina-form";
+    }
+
+    @PostMapping("/disciplinas/{id}")
+    public String atualizarDisciplina(@PathVariable Long id, @RequestParam(required = false) Long cursoId,
+                                      @RequestParam String nome, @RequestParam String codigo,
+                                      @RequestParam String cargaHoraria,
+                                      @RequestParam(required = false) String ementa,
+                                      @RequestParam(required = false) List<Long> preRequisitos,
+                                      RedirectAttributes ra) {
+        cadastro.atualizarDisciplina(id, cursoId, nome, codigo, cargaHoraria, ementa, preRequisitos);
+        ra.addFlashAttribute("sucesso", "Disciplina atualizada.");
+        return "redirect:/admin/cursos";
+    }
+
+    @PostMapping("/disciplinas/{id}/excluir")
+    public String excluirDisciplina(@PathVariable Long id, RedirectAttributes ra) {
+        cadastro.excluirDisciplina(id);
+        ra.addFlashAttribute("sucesso", "Disciplina excluída.");
         return "redirect:/admin/cursos";
     }
 
@@ -130,8 +182,9 @@ public class AdminController {
     @PostMapping("/turmas")
     public String criarTurma(@RequestParam(required = false) Long disciplinaId,
                              @RequestParam(required = false) Long professorId,
-                             @RequestParam String codigo, @RequestParam String periodo, RedirectAttributes ra) {
-        var turma = cadastro.criarTurma(disciplinaId, professorId, codigo, periodo);
+                             @RequestParam String codigo, @RequestParam String periodo,
+                             @RequestParam(required = false) String sala, RedirectAttributes ra) {
+        var turma = cadastro.criarTurma(disciplinaId, professorId, codigo, periodo, sala);
         ra.addFlashAttribute("sucesso", "Turma criada. Agora vincule os alunos.");
         return "redirect:/admin/turmas/" + turma.getId();
     }
@@ -160,10 +213,37 @@ public class AdminController {
         return "redirect:/admin/turmas/" + id;
     }
 
-    @PostMapping("/turmas/{id}/encerrar")
-    public String encerrar(@PathVariable Long id, RedirectAttributes ra) {
-        cadastro.encerrarTurma(id);
-        ra.addFlashAttribute("sucesso", "Turma encerrada. Os resultados finais já são exibidos aos alunos.");
+    /** Pedido do cliente (validação do RF04): remover aluno vinculado por engano. */
+    @PostMapping("/turmas/{id}/alunos/{alunoId}/remover")
+    public String removerAluno(@PathVariable Long id, @PathVariable Long alunoId, RedirectAttributes ra) {
+        cadastro.removerAluno(id, alunoId);
+        ra.addFlashAttribute("sucesso", "Aluno removido da turma.");
         return "redirect:/admin/turmas/" + id;
     }
+
+    /** Pedido do cliente (validação do RF04): mais de um professor por turma. */
+    @PostMapping("/turmas/{id}/professores")
+    public String adicionarProfessor(@PathVariable Long id, @RequestParam(required = false) Long professorId,
+                                     RedirectAttributes ra) {
+        cadastro.adicionarProfessor(id, professorId);
+        ra.addFlashAttribute("sucesso", "Professor adicionado à turma.");
+        return "redirect:/admin/turmas/" + id;
+    }
+
+    @PostMapping("/turmas/{id}/professores/{professorId}/remover")
+    public String removerProfessor(@PathVariable Long id, @PathVariable Long professorId, RedirectAttributes ra) {
+        cadastro.removerProfessor(id, professorId);
+        ra.addFlashAttribute("sucesso", "Professor removido da turma.");
+        return "redirect:/admin/turmas/" + id;
+    }
+
+    /** Pedido do cliente (validação do RF04): sala da turma. */
+    @PostMapping("/turmas/{id}/sala")
+    public String atualizarSala(@PathVariable Long id, @RequestParam(required = false) String sala,
+                                RedirectAttributes ra) {
+        cadastro.atualizarSala(id, sala);
+        ra.addFlashAttribute("sucesso", "Sala atualizada.");
+        return "redirect:/admin/turmas/" + id;
+    }
+    // O encerramento da turma passou para o professor (pedido do cliente): ver ProfessorController.
 }
